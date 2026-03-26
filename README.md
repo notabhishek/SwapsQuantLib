@@ -17,5 +17,11 @@ python -m tests.schedule_test
 #### Swap tests 
 ```
 python -m tests.swap_test
+python -m tests.swap_dual_curve_test
 ```
 <img src="./images/swap_plot.png" alt="Forward swap par rate curve" height="200px" />
+
+### Dual number tests 
+```
+python -m tests.dual_test
+```
