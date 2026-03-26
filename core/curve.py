@@ -47,17 +47,3 @@ class Curve:
             if next_date >= date or (idx == len(self.node_dates)-2): 
                 prev_date = self.node_dates[idx] 
                 return interpolate(date, prev_date, self.nodes[prev_date], next_date, self.nodes[next_date], self.interpolation)
-        
-
-
-# Testing 
-if __name__ == "__main__":
-    curve = Curve(interpolation='log_linear', nodes = {
-        datetime(2022, 1, 1) : 1.00,
-        datetime(2022, 4, 1) : 0.9975,
-        datetime(2022, 7, 1) : 0.9945,
-    })
-
-    print(f'{curve=}')
-    print(f'{curve[datetime(2022, 3, 15)]=}')
-    print(f'{curve[datetime(2022, 4, 1)]=}')

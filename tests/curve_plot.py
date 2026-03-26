@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from curve import Curve 
+from core.curve import Curve 
 from datetime import datetime, timedelta
 import numpy as np 
 
