@@ -36,4 +36,8 @@ x_linear, y_linear = generate_points(curve_linear, start_date, end_date)
 plt.plot(x_log_linear, y_log_linear)
 plt.plot(x_linear, y_linear)
 
+plt.title("Discount factor Curves")
+plt.xlabel("Date")
+plt.ylabel("DF")
+
 plt.show()

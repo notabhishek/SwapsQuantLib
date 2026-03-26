@@ -36,4 +36,8 @@ y_2 = np.array(par_rates_linear)
 plt.plot(x, y_1)
 plt.plot(x, y_2)
 
+plt.title("Forward curve for swap par rates")
+plt.xlabel("Term (months)")
+plt.ylabel("Par rate")
+
 plt.show()
