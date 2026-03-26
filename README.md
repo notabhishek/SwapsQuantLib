@@ -12,3 +12,8 @@ python -m tests.curve_plot
 ```
 python -m tests.schedule_test
 ```
+
+#### Swap tests 
+```
+python -m tests.swap_test
+```
