@@ -1,15 +1,5 @@
 import math
 
-def exp(x):
-    if isinstance(x, Dual):
-        return x.__exp__()
-    return math.exp(x)
-
-def log(x):
-    if isinstance(x, Dual):
-        return x.__log__()
-    return math.log(x)
-
 class Dual:
     def __init__(self, real, dual=None):
         """
