@@ -1,3 +1,5 @@
+from math import exp, log
+
 class Dual:
     def __init__(self, real, dual=None):
         """
@@ -97,4 +99,36 @@ class Dual:
         return numerator / self 
     
     def __pow__(self, power):
-        pass 
+        """
+        z = a + be 
+        z^n = a^n + nC1 a^n-1 . be + nC2 a^n-2 . (be)^2 + ...  (all e^2 = 0)
+        z^n = a^n + n.a^n-1.be 
+        """
+        mul = self.real ** (power - 1)
+        dual = {tag : mul*coef for tag, coef in self.dual.items()}
+        return Dual(self.real * mul, dual)
+    
+    def __exp__(self, power):
+        """
+        Taylor series: e^x = 1 + x/1! + x^2/2! + ...
+        e^z = e^real . e ^ b.ei
+
+        e^b.ei = 1 + b.ei/1 + 0.... (ei^2 = 0)
+
+        e^z = e^a . (1 + be)
+        """
+        real = exp(self.real)
+        dual = {tag : real * coef for tag, coef in self.dual.items()}
+        return Dual(real, dual)
+
+    def __log__(self):
+        """
+        ln(1+x) = x - x^2/2 + x^3 / 3 + x^4 / 4 + ...
+
+        => ln(z) = ln(x + be) 
+        => ln(x * (1 + be/x)) = ln(x) + ln(1 + be/x)
+        => ln(x) + [(be/x) -(be/x)^2 / 2 + (be/x)^3/3 ..] (e^2 = 0)
+        => ln(x) + be/x
+        """
+        dual = {tag: coef / self.real for tag, coef in self.dual.items()}
+        return Dual(log(self.real), dual)
