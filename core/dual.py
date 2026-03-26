@@ -86,13 +86,30 @@ class Dual:
 
     __rmul__ = __mul__ 
 
+    # This is incorrect in the book
     def __truediv__(self, other):
+        """
+        z1 = a + be1
+        z2 = c + de2
+
+        z1/z2 = (z1 * z2!) / (z2 * z2!)
+        
+        z*z! =  (a^2 + abe )
+
+        """
         if not isinstance(other, Dual):
             dual = {tag: coef / other for tag, coef in self.dual.items()}
             return Dual(self.real / other, dual)
 
-        numerator = self * other.conjugate()
-        return numerator / (self.real ** 2)
+        a, c = self.real, other.real
+
+        dual = {}
+        for tag in set(self.dual) | set(other.dual):
+            b = self.dual.get(tag, 0)
+            d = other.dual.get(tag, 0)
+            dual[tag] = (b * c - a * d) / (c ** 2)
+
+        return Dual(a / c, dual)
     
     def __rtruediv__(self, other):
         numerator = Dual(other, {})
@@ -108,7 +125,7 @@ class Dual:
         dual = {tag : mul*coef for tag, coef in self.dual.items()}
         return Dual(self.real * mul, dual)
     
-    def __exp__(self, power):
+    def __exp__(self):
         """
         Taylor series: e^x = 1 + x/1! + x^2/2! + ...
         e^z = e^real . e ^ b.ei
