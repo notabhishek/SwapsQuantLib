@@ -161,5 +161,30 @@ class SolvedCurve(Curve):
         return v_1
 
     def update_step_levenberg_marquardt(self):
-        pass 
+        """
+        Blend of gradient_descent (stable but slow) with guass_newton(unstable but fast)
+        We use lambda (damping parameter) to control the blend
+        
+        Initially gradient_descent has higher weightage but as we get closer to the target
+        we let guass_newton to take over
+        
+        vi+1 = vi + delta_i
+
+        (Ji.Ji^T + lam * I).delta_i = -(1/2).Grad_v(f)
+        """
+
+        # Update damping param 
+        self.lam *= (2 if self.f.real > self.f_prev else 0.5)
+
+        a1 = np.matmul(self.J, self.J.transpose())
+        a2 = self.lam * np.eye(self.J.shape[0]) 
+
+        A = a1 + a2
+        b = -0.5 * self.grad_v_f
+
+        # solve for A*delta = b
+        delta = np.linalg.solve(A, b)
+
+        v_1 = self.v + delta
+        return v_1
 
