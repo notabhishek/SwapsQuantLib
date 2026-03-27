@@ -122,6 +122,12 @@ class SolvedCurve(Curve):
     
     def update_step_gradient_descent(self):
         """
+        We move in the negative direction of the gradient (Grad_v(f)), 
+        the step_size alpha_i is solved by second equation 
+
+        Pro: Stable algorithm
+        Con: Slow, takes multiple iterations, especially when closer to target
+
         vi+1 = vi - aplha_i.Grad_v(f)
         alpha_i = (yi^T (ri-S)) / yi^T.yi, where yi = Ji^T.Grad_v(f)
         """ 
@@ -133,8 +139,26 @@ class SolvedCurve(Curve):
         return v_1
 
     def update_step_guass_newton(self):
-        pass 
+        """
+        Similar to gradient_descent except we solve for search_direction and step 
+        size in a single equation 
 
+        Pro: rate of converagance is faster than grad descent 
+        Con: sometimes not numerically stable, especially when initial guess is bad.
+             Usually since we have a reasonable good guess (previous solved curve), 
+             this is the best aglorithm to use
+
+        vi+1 = vi + delta_i
+        where Ji.Ji^T.delta_i = -(1/2).Grad_v(f)  
+        """
+        A = np.matmul(self.J, self.J.transpose())
+        b = -0.5 * self.grad_v_f
+
+        # Solve for A.delta = b
+        delta = np.linalg.solve(A, b)
+
+        v_1 = self.v + delta
+        return v_1
 
     def update_step_levenberg_marquardt(self):
         pass 
