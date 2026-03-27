@@ -25,3 +25,8 @@ python -m tests.swap_dual_curve_test
 ```
 python -m tests.dual_test
 ```
+
+### Solved curve tests 
+```
+python -m tests.solvedcurve_test
+```
