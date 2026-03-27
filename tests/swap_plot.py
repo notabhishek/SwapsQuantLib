@@ -34,7 +34,7 @@ y_1 = np.array(par_rates_log_linear)
 y_2 = np.array(par_rates_linear)
 
 plt.plot(x, y_1, label='log_linear_interpolation')
-plt.plot(x, y_2, label='log_linear_interpolation')
+plt.plot(x, y_2, label='linear_interpolation')
 
 plt.title("Forward curve for swap par rates")
 plt.xlabel("Term (months)")
