@@ -79,14 +79,15 @@ class SolvedCurve(Curve):
 
         # Grad_v(f) : gradient of f wrt. vi
         self.grad_v_f = np.array(
-            [[self.f.dual.get(f'v_{i}') for i in range(1, self.len_v)]]
+            [[self.f.dual.get(f'v{i}') for i in range(1, self.len_v)]]
         ).transpose()
-
+        
         # Jacobian J = Grad_v(r^T)
         self.J = np.array([
-            [rate.dual.get(f'v_{j}',0) for rate in self.r[:, 0]]
+            [rate.dual.get(f'v{j}',0) for rate in self.r[:, 0]]
             for j in range(1, self.len_v)
         ])
+
     
     def iterate(self, max_iterations=2000, tolerance =1e-10):
         msg = None # final output msg 
@@ -95,10 +96,10 @@ class SolvedCurve(Curve):
         for i in range(max_iterations):
             # Calculate r, v, f, grad_v_f, J
             self.calculate_metrics()
-
+            
             # Check if tolerance reached and we can stop
             if self.f.real < self.f_prev and (self.f_prev - self.f.real) < tolerance:
-                msg = f'tolerance reached ({self.algo} after {i} iterations)'
+                msg = f'tolerance reached ({self.algo}) after {i} iterations'
                 break 
             
             # Get next set of discount factors using optimization algo 
