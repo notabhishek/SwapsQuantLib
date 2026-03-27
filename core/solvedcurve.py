@@ -62,7 +62,8 @@ class SolvedCurve(Curve):
         self.s = np.array([self.obj_rates]).transpose()
 
         # Damping param lambda used to blend Guass-Newton with Gradient Descent
-        self.lamda = 1000 
+        self.default_lam = 1000 # used to reset lam after solving 
+        self.lamda = self.default_lam
 
 
     def calculate_metrics(self):
@@ -90,9 +91,39 @@ class SolvedCurve(Curve):
         )
     
     def iterate(self, max_iterations=2000, tolerance =1e-10):
+        msg = None # final output msg 
+        self.f_prev = 1e10 # previous error 
 
         for i in range(max_iterations):
             # Calculate r, v, f, grad_v_f, J
             self.calculate_metrics()
 
-            # TODO: implement iteration
+            # Check if tolerance reached and we can stop
+            if self.f.real < self.f_prev and (self.f_prev - self.f.real) < tolerance:
+                msg = f'tolerance reached ({self.algo} after {i} iterations)'
+                break 
+            
+            # Get next set of discount factors using optimization algo 
+            v_next = getattr(self, f'update_step_{self.algo}')
+
+            for i, date, v in enumerate(self.nodes.items()):
+                if i == 0:
+                    continue 
+                self.nodes[date] = v_next[i-1, 0]
+            self.f_prev = self.f.real 
+
+            # reset lambda 
+            self.lam = self.default_lam
+
+            if msg is None:
+                msg = f'after max_iters:{max_iterations} ({self.algo}), f: {self.f.real}'
+            return msg
+        
+    def update_step_levenberg_marquardt():
+        pass 
+
+    def update_step_guass_newton():
+        pass 
+
+    def update_step_gradient_descent():
+        pass 
