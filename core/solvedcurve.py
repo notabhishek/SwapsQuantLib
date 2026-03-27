@@ -118,12 +118,24 @@ class SolvedCurve(Curve):
             if msg is None:
                 msg = f'after max_iters:{max_iterations} ({self.algo}), f: {self.f.real}'
             return msg
-        
-    def update_step_levenberg_marquardt():
+
+    
+    def update_step_gradient_descent(self):
+        """
+        vi+1 = vi - aplha_i.Grad_v(f)
+        alpha_i = (yi^T (ri-S)) / yi^T.yi, where yi = Ji^T.Grad_v(f)
+        """ 
+        y = np.matmul(self.J, self.grad_v_f)
+        alpha = np.matmul(y.transpose(), self.x) / np.matmul(y.transpose(), y)
+        alpha = alpha[0][0].real 
+
+        v_1 = self.v - self.grad_v_f * alpha
+        return v_1
+
+    def update_step_guass_newton(self):
         pass 
 
-    def update_step_guass_newton():
+
+    def update_step_levenberg_marquardt(self):
         pass 
 
-    def update_step_gradient_descent():
-        pass 
