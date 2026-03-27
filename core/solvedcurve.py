@@ -55,8 +55,6 @@ class SolvedCurve(Curve):
 
         self.len_v = len(nodes.keys())
         self.len_s = len(swaps)
-
-        self.n, self.m = len(nodes.keys() - 1), len(swaps)
         
         # column vector of market swap rates
         self.s = np.array([self.obj_rates]).transpose()
@@ -187,4 +185,42 @@ class SolvedCurve(Curve):
 
         v_1 = self.v + delta
         return v_1
+    
 
+    # sensitivity of discount factors wrt. change in market rates
+    @property
+    def grad_s_v(self):
+        if getattr(self, 'grad_s_v_', None) is None:
+            self.grad_s_v_numeric()
+        return self.grad_s_v_
+
+
+    # Solve Grad_s(v) numerically using forward finite difference method
+    def grad_s_v_numeric(self):
+        # grad_s_v i,j is dvi/dvj 
+        # 0 <= i < len_s
+        # 1 <= j < len_v
+        grad_s_v = np.zeros(shape=(self.len_s, self.len_v - 1))
+        ds = 1e-3 
+
+        # solved forward curve 
+        s_cv_fwd = SolvedCurve(nodes=self.nodes, interpolation=self.interpolation, swaps=self.s, obj_rates=self.obj_rates, optimization_algo='guass_newton')
+
+        # calculate the small change dv in discount factors(vi) for a small change ds in the ith swap rate
+        for s_idx in range(self.len_s):
+            # reset the dfs and swap market rates 
+            s_cv_fwd.nodes, s_cv_fwd.s = self.nodes(), self.s.copy()
+            # add small change ds to s_idx'th swap
+            s_cv_fwd.s[s_idx, 0] += ds 
+
+            # iterate and solve the curve(we are using guass_newton since we had a good guess(solved curve))
+            s_cv_fwd.iterate()
+
+            # calculate dv/ds = (v_new - v)/ds
+            dvds_fwd = np.array([v.real for v in (s_cv_fwd.v[:,0] - self.v[:,0])/ds])
+            
+            # update the change in v for a small change in s_idx market swap rate
+            grad_s_v[s_idx, :] = dvds_fwd 
+        
+        # store this gradient matrix once
+        self.grad_s_v_ = grad_s_v
