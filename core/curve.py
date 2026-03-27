@@ -13,7 +13,7 @@ class Curve:
     def __repr__(self):
         output = f"interpolation={self.interpolation}\ndiscount_factors=\n"
         for node_dt, df in self.nodes.items():
-            output += f"{node_dt.strftime('%Y-%b-%d')}: {df:.6f}\n"
+            output += f"{node_dt.strftime('%Y-%b-%d')}: {df}\n"
         return output 
     
     __str__ = __repr__

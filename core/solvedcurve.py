@@ -61,7 +61,7 @@ class SolvedCurve(Curve):
 
         # Damping param lambda used to blend Guass-Newton with Gradient Descent
         self.default_lam = 1000 # used to reset lam after solving 
-        self.lamda = self.default_lam
+        self.lam = self.default_lam
 
 
     def calculate_metrics(self):
@@ -69,24 +69,24 @@ class SolvedCurve(Curve):
         self.r = np.array([[swap.rate(self) for swap in self.swaps]]).transpose()
 
         # Column vector of discount factors (excluding v0)
-        self.v = np.array([[v for v in self.nodes.values()[1:]]]).transpose()
+        self.v = np.array([[v for v in list(self.nodes.values())[1:]]]).transpose()
 
         # error column vector x = (r-s) 
-        self.x = self.r - self.s 
+        x = self.r - self.s 
 
         # objective function f = x^T . x
-        self.f = np.matmul(self.x.transpose(), self.x)[0][0]
+        self.f = np.matmul(x.transpose(), x)[0][0]
 
         # Grad_v(f) : gradient of f wrt. vi
         self.grad_v_f = np.array(
-            [[self.f.dual[f'v_{i}'] for i in range(1, self.len_v)]]
-        )
+            [[self.f.dual.get(f'v_{i}') for i in range(1, self.len_v)]]
+        ).transpose()
 
         # Jacobian J = Grad_v(r^T)
-        self.J = np.array(
-            [rate.dual[f'v_{j}'] for rate in self.r[:, 0]]
+        self.J = np.array([
+            [rate.dual.get(f'v_{j}',0) for rate in self.r[:, 0]]
             for j in range(1, self.len_v)
-        )
+        ])
     
     def iterate(self, max_iterations=2000, tolerance =1e-10):
         msg = None # final output msg 
@@ -102,20 +102,21 @@ class SolvedCurve(Curve):
                 break 
             
             # Get next set of discount factors using optimization algo 
-            v_next = getattr(self, f'update_step_{self.algo}')
+            step_method = getattr(self, f'update_step_{self.algo}')
+            v_next = step_method()
 
-            for i, date, v in enumerate(self.nodes.items()):
+            for i, (date, v) in enumerate(self.nodes.items()):
                 if i == 0:
                     continue 
                 self.nodes[date] = v_next[i-1, 0]
             self.f_prev = self.f.real 
 
-            # reset lambda 
-            self.lam = self.default_lam
+        # reset lambda 
+        self.lam = self.default_lam
 
-            if msg is None:
-                msg = f'after max_iters:{max_iterations} ({self.algo}), f: {self.f.real}'
-            return msg
+        if msg is None:
+            msg = f'after max_iters:{max_iterations} ({self.algo}), f: {self.f.real}'
+        return msg
 
     
     def update_step_gradient_descent(self):
@@ -129,8 +130,8 @@ class SolvedCurve(Curve):
         vi+1 = vi - aplha_i.Grad_v(f)
         alpha_i = (yi^T (ri-S)) / yi^T.yi, where yi = Ji^T.Grad_v(f)
         """ 
-        y = np.matmul(self.J, self.grad_v_f)
-        alpha = np.matmul(y.transpose(), self.x) / np.matmul(y.transpose(), y)
+        y = np.matmul(self.J.transpose(), self.grad_v_f)
+        alpha = np.matmul(y.transpose(), self.r - self.s) / np.matmul(y.transpose(), y)
         alpha = alpha[0][0].real 
 
         v_1 = self.v - self.grad_v_f * alpha
