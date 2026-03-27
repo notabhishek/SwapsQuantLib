@@ -10,7 +10,7 @@ class Swap:
         self.end = add_months_modfollowing(start, tenor_m)
         self.schedule_fix = Schedule(start, tenor_m, period_fix_m)
         self.schedule_float = Schedule(start, tenor_m, period_float_m)
-
+        self.tenor_m = tenor_m
     
     def __repr__(self):
         format = '%Y-%b-%d'
