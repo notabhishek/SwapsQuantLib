@@ -23,7 +23,7 @@ par_rates_log_linear = []
 par_rates_linear = []
 for m in range(1, 50 * 12 + 1):
     # Annual swap with tenor m months
-    swap = Swap(start_date, tenor_m=m, period_fix_m=12, period_float_m=1)
+    swap = Swap(start_date, tenor_m=m, period_fix_m=12, period_float_m=12)
     tenors.append(m)
     par_rates_log_linear.append(swap.rate(curve_log_linear))
     par_rates_linear.append(swap.rate(curve_linear))
@@ -33,11 +33,11 @@ x = np.array(tenors)
 y_1 = np.array(par_rates_log_linear)
 y_2 = np.array(par_rates_linear)
 
-plt.plot(x, y_1)
-plt.plot(x, y_2)
+plt.plot(x, y_1, label='log_linear_interpolation')
+plt.plot(x, y_2, label='log_linear_interpolation')
 
 plt.title("Forward curve for swap par rates")
 plt.xlabel("Term (months)")
 plt.ylabel("Par rate")
-
+plt.legend()
 plt.show()
