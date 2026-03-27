@@ -30,3 +30,4 @@ python -m tests.dual_test
 ```
 python -m tests.solvedcurve_test
 ```
+<img src="./images/solved_curve_plot.png" alt="Forward swap par rate curve" height="200px" />
