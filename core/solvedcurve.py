@@ -206,12 +206,12 @@ class SolvedCurve(Curve):
         ds = 1e-3 
 
         # solved forward curve 
-        s_cv_fwd = SolvedCurve(nodes=self.nodes, interpolation=self.interpolation, swaps=self.s, obj_rates=self.obj_rates, optimization_algo='guass_newton')
+        s_cv_fwd = SolvedCurve(nodes=self.nodes, interpolation=self.interpolation, swaps=self.swaps, obj_rates=self.obj_rates, optimization_algo='guass_newton')
 
         # calculate the small change dv in discount factors(vi) for a small change ds in the ith swap rate
         for s_idx in range(self.len_s):
             # reset the dfs and swap market rates 
-            s_cv_fwd.nodes, s_cv_fwd.s = self.nodes(), self.s.copy()
+            s_cv_fwd.nodes, s_cv_fwd.s = self.nodes, self.s.copy()
             # add small change ds to s_idx'th swap
             s_cv_fwd.s[s_idx, 0] += ds 
 

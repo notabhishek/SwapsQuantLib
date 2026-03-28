@@ -70,7 +70,7 @@ class Swap:
 
         # column vector of d npv(swap)/dvi,  1<=i<len_v
         grad_v_P = np.array([
-            [self.npv(curve, fixed_rate=fixed_rate, notional=notional).dual.get(f'v_{v_idx}', 0)
+            [self.npv(curve, fixed_rate=fixed_rate, notional=notional).dual.get(f'v{v_idx}', 0)
             for v_idx in range (1, curve.len_v)]
         ]).transpose()
 
