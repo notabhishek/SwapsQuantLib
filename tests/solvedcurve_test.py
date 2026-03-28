@@ -20,12 +20,12 @@ def get_test_data():
         Swap(datetime(2022, 1, 1), 12 * 1, 12, 12)  : 1.210,
         Swap(datetime(2022, 1, 1), 12 * 2, 12, 12)  : 1.635,
         Swap(datetime(2022, 1, 1), 12 * 5, 12, 12)  : 1.885,
-        Swap(datetime(2022, 1, 1), 12 * 10, 12, 12) : 1.935,
+        Swap(datetime(2022, 1, 1), 12 * 10, 12, 12) : 1.930,
     }
 
     return nodes, par_swaps
 
-def get_solvedcurve(algorithm='levenberg_marquardt'):
+def get_solvedcurve(algorithm: str ='levenberg_marquardt'):
     # intial discount factor guess
     nodes, par_swaps = get_test_data()
 
@@ -67,7 +67,7 @@ def plot_curve(curve: SolvedCurve):
     plt.legend()
     plt.show()
 
-if __name__ == '__main__':
+def test_diff_opt_algos():
     for algo in ['guass_newton', 'gradient_descent', 'levenberg_marquardt']:
         s_cv = get_solvedcurve(algo)
 
@@ -77,10 +77,28 @@ if __name__ == '__main__':
         # print('Solving')
         print(s_cv.iterate())
 
-        # print('\nSolved curve')
-        # print(s_cv)
+        print('\nSolved curve')
+        print(s_cv)
 
-    # plot the curve 
+def test_plot_curve_against_market():
     s_cv = get_solvedcurve('levenberg_marquardt')
+    # plot the solved curve against market rates
     plot_curve(s_cv)
+
+def test_do_risk(): 
+    # curve with lm optimization
+    s_cv = get_solvedcurve('levenberg_marquardt')
+    print(s_cv.iterate())
+
+    # 5y fwd starting 5y swap
+    swap5y5y = Swap(datetime(2027, 1, 1), 12 * 5, 12, 12)
+    risk5y5y = swap5y5y.risk(s_cv, fixed_rate=swap5y5y.rate(s_cv).real, notional=100e6) 
+
+    print(f'{risk5y5y=}')
+
+if __name__ == '__main__':
+    # test_diff_opt_algos()
+    test_do_risk()
+    # test_plot_curve_against_market()
+   
     
