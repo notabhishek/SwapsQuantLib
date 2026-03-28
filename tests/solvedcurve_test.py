@@ -4,6 +4,7 @@ from core.swap import Swap
 from core.solvedcurve import SolvedCurve
 import numpy as np
 import matplotlib.pyplot as plt 
+import pandas as pd 
 
 def get_test_data():
     init_v = 1
@@ -90,12 +91,37 @@ def test_do_risk():
     s_cv = get_solvedcurve('levenberg_marquardt')
     print(s_cv.iterate())
 
+    nodes, swaps = get_test_data()
+    print(f"{'Market':<20} {'Implied':<20} Diff")
+    for swap, market_rate in swaps.items():
+        implied_rate = swap.rate(s_cv).real
+        print(f'{market_rate:<20} {implied_rate:<20} {implied_rate-market_rate:<20}')
+    
+
     # 5y fwd starting 5y swap
     swap5y5y = Swap(datetime(2027, 1, 1), 12 * 5, 12, 12)
     risk5y5y = swap5y5y.risk(s_cv, fixed_rate=swap5y5y.rate(s_cv).real, notional=100e6) 
 
     print(f'{risk5y5y=}')
 
+    fwd_swaps = {
+        Swap(datetime(2022, 1, 1), 12*1, 12, 12) : 1,
+        Swap(datetime(2023, 1, 1), 12*1, 12, 12) : 1,
+        Swap(datetime(2024, 1, 1), 12*3, 12, 12) : 1,
+        Swap(datetime(2027, 1, 1), 12*5, 12, 12) : 1,
+    }
+
+    # update rate to par rates
+    for swap in fwd_swaps.keys():
+        fwd_swaps[swap] = swap.rate(s_cv).real
+
+    risk = {}
+    for swap, rate in fwd_swaps.items():
+        risk.update({swap.end : swap.risk(s_cv, fixed_rate=rate)[:, 0]})
+    
+    df = pd.DataFrame(risk, index=["1y", "2y", "5y", "10y"])
+    # df.style.format("{:.6f}")
+    print(df/df.sum())
 if __name__ == '__main__':
     # test_diff_opt_algos()
     test_do_risk()
