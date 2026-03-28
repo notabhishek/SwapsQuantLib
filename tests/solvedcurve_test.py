@@ -122,6 +122,7 @@ def test_do_risk():
     df = pd.DataFrame(risk, index=["1y", "2y", "5y", "10y"])
     # df.style.format("{:.6f}")
     print(df/df.sum())
+
 if __name__ == '__main__':
     # test_diff_opt_algos()
     test_do_risk()
