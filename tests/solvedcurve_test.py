@@ -119,8 +119,28 @@ def test_do_risk():
     for swap, rate in fwd_swaps.items():
         risk.update({swap.end : swap.risk(s_cv, fixed_rate=rate)[:, 0]})
     
-    df = pd.DataFrame(risk, index=["1y", "2y", "5y", "10y"])
-    # df.style.format("{:.6f}")
+    pd.set_option('display.float_format', '{:.3f}'.format)
+
+    df = pd.DataFrame(risk)
+    df.index=["1y", "2y", "5y", "10y"]
+    df.columns = ['1y', '1y1y', '2y3y', '5y5y']
+    
+    print('\n\nBuild curve using spot swaps and risk forward swaps using it')
+    print(df / df.sum())
+
+
+    # Building another curve using these forward swaps and then risking the spot swapss
+    s_cv2 = SolvedCurve(nodes=nodes, swaps=list(fwd_swaps.keys()), obj_rates=list(fwd_swaps.values()), interpolation='log_linear', optimization_algo='levenberg_marquardt')
+    print(s_cv2.iterate())
+    risk = {}
+
+    for swap, rate in swaps.items():
+        risk.update({swap.end : swap.risk(s_cv2, fixed_rate=rate)[:, 0]})
+    
+    df = pd.DataFrame(risk)
+    df.index=['1y', '1y1y', '2y3y', '5y5y']
+    df.columns = ["1y", "2y", "5y", "10y"]
+    print('\n\nBuild curve using fwd swaps and risk spot swaps using it')
     print(df/df.sum())
 
 if __name__ == '__main__':
