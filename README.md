@@ -7,7 +7,14 @@ Swaps Curve construction and Pricing library
 python -m tests.curve_test   
 python -m tests.curve_plot 
 ```
-<img src="./images/curve_plot.png" alt="Discount factor curve" height="200px"/>
+We used linear and log linear interpolation on discount factors to build the curve,
+and then also plotted the O/N forward rates implied by the DF curve 
+
+- Log-linear gives flat rate between knots, and has discontinuous jumps at knots 
+- Linear has an upward slope between knots and has a sharpe elbow at knots
+- TODO: cubic-spline (B-splines) to produce smoother forward curve
+
+<img src="./images/curve_plot.png" alt="Discount factor curve" height="400px" width="800px"/>
 
 #### Schedule tests
 ```
