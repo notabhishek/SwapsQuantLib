@@ -1,5 +1,5 @@
 # SwapsQuantLib
-Swaps Curve construction and Pricing library
+Swaps Curve construction and Pricing library, uses Dual numbers to do automatic algorithmic differentiation (AAD)
 
 ### Running tests
 #### Curve tests
