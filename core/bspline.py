@@ -24,12 +24,12 @@ def bsplev_single(x, i, k, t, org_k = None):
     if k == 1:
         #        {1, t[i] <= x < t[i+1]}
         # Bi,1 = {0, otherwise         }
-        return 1 if (t[i] <= x <= t[i+1]) else 0
+        return 1 if (t[i] <= x < t[i+1]) else 0
     else:
         left, right = 0, 0
         if t[i] != t[i+k-1]:
             left = ((x - t[i]) / (t[i+k-1] - t[i])) * bsplev_single(x, i, k-1, t)
-        if t[i] != t[i+k]:
+        if t[i+1] != t[i+k]:
             right = ((t[i+k] - x) / (t[i+k] - t[i+1])) * bsplev_single(x, i+1, k-1, t)
         return left + right
 
