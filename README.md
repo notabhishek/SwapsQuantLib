@@ -63,4 +63,4 @@ Notice how due to repeated knots (2) we kill the smoothness at B2,3
 Plotting B-Splines of order 1 to 4, for t = [1, 1, 1, 1, 2, 3, 4, 5, 6, 6, 6, 6], 
 without repeated knots 
 
-<img src="./images/bspline_plot.png" alt="Bsplines with repeated knots" height="600px" width="800px" />
+<img src="./images/bspline_plot2.png" alt="Bsplines with repeated knots" height="600px" width="800px" />
