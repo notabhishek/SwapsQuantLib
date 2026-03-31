@@ -25,6 +25,12 @@ A compact Python library for swap curve construction, discount curve calibration
   </tr>
 </table>
 
+### Curves with turns on certain dates using SwapSpread instruments
+- Use SwapSpread instrument to specify -0.25bp turn on 31-12-2022 and 30-06-2023
+
+<img src="./images/advanced_curve3.png" alt="Curve with turns and swap spread" height="300px" width="500px" />
+
+
 ## B-spline implementation (visible, all key plots)
 - B-spline basis generation (orders 1–4)
 - Repeated knot handling (smoothness reduction as expected)
