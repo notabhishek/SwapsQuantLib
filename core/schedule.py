@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 # Add n months to date, keeping modified following convention 
-def add_months_modfollowing(start: datetime, months: int):
+def add_months_modfollowing(start: datetime, months: int) -> datetime:
     year_roll = (start.month - 1 + months) // 12
     
     month = (start.month + months) % 12 
@@ -13,15 +13,28 @@ def add_months_modfollowing(start: datetime, months: int):
         # try with day-1
         return add_months_modfollowing(datetime(start.year, start.month, start.day - 1), months)
 
+# add n days to date 
+def add_days(start: datetime, days: int) -> datetime: 
+    return start + timedelta(days = days)
+
 class Schedule:
-    def __init__(self, start: datetime, tenor_months: int, period_months: int):
+    def __init__(self, start: datetime, tenor: int, period: int, tenor_type: str = 'M'):
         self.start = start 
-        self.end = add_months_modfollowing(start, tenor_months)
-        self.tenor_months = tenor_months
-        self.period_months = period_months
+        
+        # TODO: add tenor_type W, Y
+        if tenor_type == 'M':
+            self.add_op = add_months_modfollowing
+        elif tenor_type == 'D':
+            self.add_op == add_days
+        else: 
+            raise ValueError(f'Only support tenor_type D, M but got {tenor_type}')
+        
+        self.end = self.add_op(start, tenor)
+        self.tenor = tenor
+        self.period = period
         
         self.dcf_convention = timedelta(days = 365) # Using ACT/365 for day count fraction
-        self.num_periods = (self.tenor_months + self.period_months - 1) // self.period_months 
+        self.num_periods = (self.tenor + self.period - 1) // self.period 
     
     @property
     def data(self):
@@ -30,7 +43,7 @@ class Schedule:
         
         # Insert num_periods-1 periods (start, end, dcf)
         for _ in range(self.num_periods - 1):
-            period_end = add_months_modfollowing(period_start, self.period_months)
+            period_end = self.add_op(period_start, self.period)
             period_dcf = (period_end - period_start) / self.dcf_convention
 
             period = [period_start, period_end, period_dcf]
