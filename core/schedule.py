@@ -20,12 +20,12 @@ def add_days(start: datetime, days: int) -> datetime:
 class Schedule:
     def __init__(self, start: datetime, tenor: int, period: int, tenor_type: str = 'M'):
         self.start = start 
-        
+
         # TODO: add tenor_type W, Y
         if tenor_type == 'M':
             self.add_op = add_months_modfollowing
         elif tenor_type == 'D':
-            self.add_op == add_days
+            self.add_op = add_days
         else: 
             raise ValueError(f'Only support tenor_type D, M but got {tenor_type}')
         

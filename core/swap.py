@@ -12,7 +12,7 @@ class Swap:
         if tenor_type == 'M':
             self.add_op = add_months_modfollowing
         elif tenor_type == 'D':
-            self.add_op == add_days
+            self.add_op = add_days
         else: 
             raise ValueError(f'Only support tenor_type D, M but got {tenor_type}')
         
