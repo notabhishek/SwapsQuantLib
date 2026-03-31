@@ -6,15 +6,21 @@ Swaps Curve construction and Pricing library, uses Dual numbers to do automatic 
 ```
 python -m tests.curve_test   
 python -m tests.curve_plot 
+python -m tests.advancedcurve_test
 ```
-We used linear and log linear interpolation on discount factors to build the curve,
-and then also plotted the O/N forward rates implied by the DF curve 
+Use market observed swap rates to caliberate the discount curve and then plot O/N RF rates. 
 
-- Log-linear gives flat rate between knots, and has discontinuous jumps at knots 
-- Linear has an upward slope between knots and has a sharpe elbow at knots
-- TODO: cubic-spline (B-splines) to produce smoother forward curve
+- Log-linear gives flat rate between knots, and has discontinuous jumps at knots(steps)
+- Linear has an upward slope between knots and has a sharp elbow at knots
+- Mixed interpolation (cubic B-spline + log_linear fallback for date < first knot gives smooth curves) 
 
-<img src="./images/curve_plot.png" alt="Discount factor curve" height="400px" width="800px"/>
+##### Example: Caliberated with 1Y,2Y,3Y swaps starting 2022-1-1
+Notice: mixed interpolation falls back to log-linear before first knot 2023-1-1
+
+<img src="./images/advanced_curve1.png" alt="O/N RFR curve" height="400px" width="800px"/>
+
+##### Exampe2: 10Y curve
+<img src="./images/advanced_curve2.png" alt="O/N RFR curve" height="500px" width="`1000px"/>
 
 #### Schedule tests
 ```
