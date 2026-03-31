@@ -86,7 +86,7 @@ class SolvedCurve(Curve):
         self.grad_v_f = np.array(
             [[self.f.dual.get(f'v{i}',0) for i in range(1, self.len_v)]]
         ).transpose()
-        
+
         # Jacobian J = Grad_v(r^T)
         self.J = np.array([
             [rate.dual.get(f'v{j}',0) for rate in self.r[:, 0]]
@@ -104,7 +104,7 @@ class SolvedCurve(Curve):
             
             # Check if tolerance reached and we can stop
             if self.f.real < self.f_prev and (self.f_prev - self.f.real) < tolerance:
-                msg = f'tolerance reached ({self.algo}) after {i} iterations'
+                msg = f'tolerance reached ({self.algo}) after {i} iterations. f:{self.f.real}'
                 break 
             
             # Get next set of discount factors using optimization algo 
@@ -184,7 +184,7 @@ class SolvedCurve(Curve):
         self.lam *= (2 if self.f.real > self.f_prev else 0.5)
 
         J_T = self.J.transpose()
-        WJ_T = J_T if self.W is None else np.matmul(self.W, self.J_T)
+        WJ_T = J_T if self.W is None else np.matmul(self.W, J_T)
         a1 = np.matmul(self.J, WJ_T)
         a2 = self.lam * np.eye(self.J.shape[0]) 
 
