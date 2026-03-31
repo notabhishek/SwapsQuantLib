@@ -7,9 +7,9 @@ A compact Python library for swap curve construction, discount curve calibration
   - `gauss_newton`
   - `levenberg_marquardt`
 - Interpolation modes:
-  - **Log-linear** (flat between knots, step-wise)
-  - **Linear** (piecewise linear with elbows at knots)
-  - **Mixed** (cubic B-spline + log-linear fallback before first knot)
+  - `Log-linear` (flat between knots, step-wise)
+  - `Linear` (piecewise linear with elbows at knots)
+  - `Mixed` (cubic B-spline + log-linear fallback before first knot)
 - **Turns** and **Curvature constraints** support via SwapSpread instruments
 - **Weighted optimization**, pass weights to prefer repricing some instruments over others
 - **Layered curves**, caliberate using some instruments and then recaliberate with additional instrume
