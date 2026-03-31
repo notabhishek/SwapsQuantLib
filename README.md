@@ -25,7 +25,7 @@ A compact Python library for swap curve construction, discount curve calibration
 - 2nd-layer swaps from 4y, 6y, 8y, 9y, 12y, 35y (skew adjustments on long end) are added using:
   - `skews_layer_2 = {Swap(...): value, ...}`
 
-<img src="./images/advanced_curve6.png" alt="Mixed cubic + log-linear + turns + 2-layer skews" height="500px" />
+<img src="./images/advanced_curve6.png" alt="Mixed cubic + log-linear + turns + 2-layer skews" />
 
 <table>
   <tr>
