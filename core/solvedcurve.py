@@ -47,11 +47,15 @@ class SolvedCurve(Curve):
                     interpolation: str, 
                     swaps: list, 
                     obj_rates: list,
-                    optimization_algo = 'levenberg_marquardt'):
+                    optimization_algo = 'levenberg_marquardt',
+                    w: list = None):
         
         super().__init__(interpolation=interpolation, nodes=nodes)
 
         self.swaps, self.obj_rates, self.algo = swaps, obj_rates, optimization_algo
+        # Instead of minimizing x=(r-s) we will minimize x^T . Wx, allowing us 
+        # to prioritize repricing some instruments over others
+        self.W = None if w is None else np.diag(w)
 
         self.len_v = len(nodes.keys())
         self.len_s = len(swaps)
@@ -73,13 +77,14 @@ class SolvedCurve(Curve):
 
         # error column vector x = (r-s) 
         x = self.r - self.s 
+        Wx = x if self.W is None else np.matmul(self.W, x)
 
-        # objective function f = x^T . x
-        self.f = np.matmul(x.transpose(), x)[0][0]
+        # objective function f = x^T . Wx
+        self.f = np.matmul(x.transpose(), Wx)[0][0]
 
         # Grad_v(f) : gradient of f wrt. vi
         self.grad_v_f = np.array(
-            [[self.f.dual.get(f'v{i}') for i in range(1, self.len_v)]]
+            [[self.f.dual.get(f'v{i}',0) for i in range(1, self.len_v)]]
         ).transpose()
         
         # Jacobian J = Grad_v(r^T)
@@ -151,7 +156,9 @@ class SolvedCurve(Curve):
         vi+1 = vi + delta_i
         where Ji.Ji^T.delta_i = -(1/2).Grad_v(f)  
         """
-        A = np.matmul(self.J, self.J.transpose())
+        J_T = self.J.transpose()
+        WJ_T = J_T if self.W is None else np.matmul(self.W, J_T)
+        A = np.matmul(self.J, WJ_T)
         b = -0.5 * self.grad_v_f
 
         # Solve for A.delta = b
@@ -176,7 +183,9 @@ class SolvedCurve(Curve):
         # Update damping param 
         self.lam *= (2 if self.f.real > self.f_prev else 0.5)
 
-        a1 = np.matmul(self.J, self.J.transpose())
+        J_T = self.J.transpose()
+        WJ_T = J_T if self.W is None else np.matmul(self.W, self.J_T)
+        a1 = np.matmul(self.J, WJ_T)
         a2 = self.lam * np.eye(self.J.shape[0]) 
 
         A = a1 + a2
