@@ -1,76 +1,58 @@
 # SwapsQuantLib
-Swaps Curve construction and Pricing library, uses Dual numbers to do automatic algorithmic differentiation (AAD)
+A compact Python library for swap curve construction, discount curve calibration, and pricing using automatic differentiation with dual numbers.
 
-### Running tests
-#### Curve tests
-```
-python -m tests.curve_test   
-python -m tests.curve_plot 
-python -m tests.advancedcurve_test
-```
-Use market observed swap rates to caliberate the discount curve and then plot O/N RF rates. 
+## Features
+- Calibrate discount curves to objective rates (liquid market swap rates) using:
+  - `gradient_descent`
+  - `gauss_newton`
+  - `levenberg_marquardt`
+- Interpolation modes:
+  - **Log-linear** (flat between knots, step-wise)
+  - **Linear** (piecewise linear with elbows at knots)
+  - **Mixed** (cubic B-spline + log-linear fallback before first knot)
+- Automatic Differentiation via custom `Dual` numbers to compute sensitivities and optimize efficiently.
+- Swap and schedule support: build payment dates, fixed/float legs, and par-rate computations.
 
-- Log-linear gives flat rate between knots, and has discontinuous jumps at knots(steps)
-- Linear has an upward slope between knots and has a sharp elbow at knots
-- Mixed interpolation (cubic B-spline + log_linear fallback for date < first knot gives smooth curves) 
+## Curve calibration and swap outputs
+- **Log-linear** gives a flat rate between knots (step shape).
+- **Linear** gives an upward slope between knots (straight line segments).
+- **Mixed** gives a smooth curve between knots (B-spline) and falls back to log-linear before the first knot.
 
-##### Example: Caliberated with 1Y,2Y,3Y swaps starting 2022-1-1
-Notice: mixed interpolation falls back to log-linear before first knot 2023-1-1
+<table>
+  <tr>
+    <td><strong>3Y O/N RFR curve (mixed interpolation)</strong><br/><img src="./images/advanced_curve1.png" alt="O/N RFR curve" height="300px" width="500px" /></td>
+    <td><strong>10Y curve example</strong><br/><img src="./images/advanced_curve2.png" alt="10Y calibrated curve" height="300px" width="500px" /></td>
+  </tr>
+</table>
 
-<img src="./images/advanced_curve1.png" alt="O/N RFR curve" height="300px" width="500px"/>
+## B-spline implementation (visible, all key plots)
+- B-spline basis generation (orders 1–4)
+- Repeated knot handling (smoothness reduction as expected)
+- Derivative evaluation for B-spline curves
 
-##### Exampe2: 10Y curve
-<img src="./images/advanced_curve2.png" alt="O/N RFR curve" height="500px" width="`1000px"/>
+### Plot: B-splines (repeated knots)
+<img src="./images/bspline_plot.png" alt="Bsplines with repeated knots" height="400px" width="533px" />
 
-#### Schedule tests
-```
-python -m tests.schedule_test
-```
+### Plot: B-splines (no repeats)
+<img src="./images/bspline_plot2.png" alt="Bsplines without repeated knots" height="400px" width="533px" />
 
-#### Swap tests 
-```
-python -m tests.swap_test
-python -m tests.swap_dual_curve_test
-```
-<details>
-    <summary>Plot par rates for different swap tenors</summary>
+### Plot: B-spline derivative (order 4)
+<img src="./images/bspline_der_plot.png" alt="BSpline derivatives" height="320px" width="320px" />
 
-<img src="./images/swap_plot.png" alt="Forward swap par rate curve" height="200px" />
-</details>
+## How to run tests
+- Schedule path generation
+  - `python -m tests.schedule_test`
+- Swap pricing and swap curve tests
+  - `python -m tests.swap_test`
+  - `python -m tests.swap_dual_curve_test`
+- Dual number unit tests
+  - `python -m tests.dual_test`
+- Solved curve & calibration tests
+  - `python -m tests.solvedcurve_test`
+- B-spline plots
+  - `python -m tests.bspline_plot`
 
-### Dual number tests 
-```
-python -m tests.dual_test
-```
+## Notes
+- This repo is a functional prototype focused on curve construction and calibration; it is not intended as a production-grade implementation.
+- Reference: "Pricing and Trading Interest Rate Derivatives" by JHM Darbyshire.
 
-### Solved curve tests 
-```
-python -m tests.solvedcurve_test
-```
-<img src="./images/solved_curve_plot.png" alt="Forward swap par rate curve" height="200px" />
-
-### BSpline plots 
-```
-python -m tests.bspline_plot
-```
-Plotting B-splines of order 1 to 4, for knot seq t=[1, 1, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4]
-NOTE: only plotted non-zero values to avoid clutter
-
-- 1st order splines Bi,k=1 are just steps between t[i] and t[i+1]
-- 2nd order splines Bi,k=2 form mountains from t[i], t[i+1], t[i+2] with peak at t[i+1]
-- 3rd order splines Bi,k=3 form parabolas using t[i] to t[i+3]
-- 4th order splines Bi,k=4 are smooth bell curves
-
-Notice how due to repeated knots (2) we kill the smoothness at B2,3
-
-<img src="./images/bspline_plot.png" alt="Bsplines with repeated knots" height="600px" width="800px" />
-
-
-Plotting B-Splines of order 1 to 4, for t = [1, 1, 1, 1, 2, 3, 4, 5, 6, 6, 6, 6], 
-without repeated knots 
-
-<img src="./images/bspline_plot2.png" alt="Bsplines with repeated knots" height="600px" width="800px" />
-
-Plotting first derivatives of d(Bi,k=4,t)/dx for knot seq t=[1, 1, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4]
-
-<img src="./images/bspline_der_plot.png" alt="BSpline derivatives" height="400px" width="400px" />
