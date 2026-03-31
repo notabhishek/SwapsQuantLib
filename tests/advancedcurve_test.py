@@ -3,9 +3,8 @@ from core.swap import Swap
 from core.advancedcurve import AdvancedCurve
 from core.dual import Dual 
 from core.solvedcurve import SolvedCurve
-import matplotlib.pyplot as plt 
-from core.curve import Curve
-
+import matplotlib.pyplot as plt
+from core.swapspread import SwapSpread
 def get_test_data():
     init_v = 1
     nodes = {
@@ -103,6 +102,65 @@ def plot_on_ex2():
 
     plot_on_rfr_curves(nodes_dual, swaps, plot_start=datetime(2021, 1, 1), plot_days=365 * 10)
 
+# Plot with turns
+def plot_ON_ex3():
+    nodes = {
+        datetime(2022, 1, 1): 1.00,
+        datetime(2022, 12, 31): 1.00, # -.25 bp turn here
+        # don't need another node to undo Dec31 as we already have a node on Jan 1
+        
+        datetime(2023, 1, 1): 1.00,
+
+        datetime(2023, 6, 30): 1.00, # -0.25bp turn here
+        datetime(2023, 7, 1): 1.00,  # +0.25bp here to undo turn 
+        
+        datetime(2024, 1, 1): 1.00,
+        datetime(2025, 1, 1): 1.00,
+    }
+
+    nodes_dual = {k: Dual(v, {f"v{i}": 1}) for i, (k,v) in enumerate(nodes.items())}
+    
+    swaps = {
+        Swap(datetime(2022, 1, 1), 12 * 1, 12, 12, tenor_type='M')  : 1.0,
+        Swap(datetime(2022, 1, 1), 12 * 2, 12, 12, tenor_type='M')  : 1.5,
+        Swap(datetime(2022, 1, 1), 12 * 3, 12, 12, tenor_type='M')  : 2.0,
+        # 1D turn -0.25bp on 31st Dec 2022. 1Y Swap ending on 1st Jan 2023 
+        # will undo this so don't need opposite turn
+        SwapSpread(
+            Swap(datetime(2022, 12, 30), 1, 1, 1, tenor_type='D'),
+            Swap(datetime(2022, 12, 31), 1, 1, 1, tenor_type='D'),
+        ) : -0.25,
+
+        # # 1D turn -0.25bp on 30th June 2022
+        SwapSpread(
+            Swap(datetime(2023, 6, 29), 1, 1, 1, tenor_type='D'),
+            Swap(datetime(2023, 6, 30), 1, 1, 1, tenor_type='D'),
+        ) : -0.25,
+        # # undo the turn for next day with +0.25bp
+        SwapSpread(
+            Swap(datetime(2023, 6, 30), 1, 1, 1, tenor_type='D'),
+            Swap(datetime(2023, 7, 1), 1, 1, 1, tenor_type='D'),
+        ) : 0.25,
+    }
+
+    s_cv_log = SolvedCurve(nodes=nodes_dual, interpolation='log_linear',
+                    swaps=list(swaps.keys()), obj_rates=list(swaps.values()),
+                    optimization_algo='levenberg_marquardt')
+    print(f'Solving SolvedCurve(log_linear)                     :{s_cv_log.iterate()}')
+    fig, ax = plt.subplots()
+    plot_start = datetime(2022, 1, 1)
+    x = [plot_start + i * timedelta(days=1) for i in range(3 * 365)]
+
+    z = [s_cv_log.rate(date, days=1).real for date in x]
+
+    ax.plot(x, z, label='Log-linear interpolation')
+    plt.title('Overnight forward RFR with -0.25bp turns on 31-Dec-2022 and 30-June-2023')
+    plt.xlabel('Date')
+    plt.ylabel('RFR(%)')
+    plt.legend()
+    plt.show()
+
 if __name__ == '__main__':
     plot_on_ex1()
     plot_on_ex2()
+    plot_ON_ex3()
