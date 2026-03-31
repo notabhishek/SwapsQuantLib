@@ -10,6 +10,7 @@ class AdvancedCurve(SolvedCurve):
         # Knot sequence of dates
         self.t = t 
         self.bs = BSpline(4, t) # 4th order B-splines 
+        self.not_iterated = True
     
     # Mixed interpolation 
     def __getitem__(self, date: datetime):
@@ -42,3 +43,14 @@ class AdvancedCurve(SolvedCurve):
     def calculate_metrics(self):
         self.solve_bspline()
         return super().calculate_metrics()
+    
+    # Optimization: First solves the log-linear curve use 
+    # LM and then uses guass_newton for next few iterations
+    def iterate(self):
+        if self.not_iterated:
+            w = None if self.W is None else np.diag(self.W)
+            base_solve = SolvedCurve(self.nodes, self.interpolation, self.swaps, self.obj_rates, optimization_algo=self.algo, w=w)
+            print('Basic solve:', base_solve.iterate())
+            self.nodes = base_solve.nodes
+            self.not_iterated, self.algo = False, 'guass_newton'
+        return super().iterate()
