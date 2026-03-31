@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from core.mathutils import interpolate
+from core.swap import add_months_modfollowing
 
 class Curve:
     """
@@ -25,3 +26,17 @@ class Curve:
             if next_date >= date or (idx == len(self.node_dates)-2): 
                 prev_date = self.node_dates[idx] 
                 return interpolate(date, prev_date, self.nodes[prev_date], next_date, self.nodes[next_date], self.interpolation)
+
+    def rate(self, start: datetime, months: int = None, days: int = None):
+        if months is not None:
+            end = add_months_modfollowing(start, months)
+        elif days is not None:
+            end = start + timedelta(days=days)
+        else:
+            end = None
+        # (1+r*dcf)*df_end = df_start
+        # 1+r*dcf = df_start/df_end
+        # r = [(df_start/df_end) - 1] / dcf 
+        df_ratio = self[start] / self[end]
+        rate = (df_ratio - 1) * timedelta(days=365) / (end - start) # ACT/365
+        return rate * 100
