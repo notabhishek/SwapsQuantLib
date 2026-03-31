@@ -394,8 +394,6 @@ def get_testdata_with_curvature_conds(include_curvature_conds: bool = False, lay
         Swap(datetime(2022, 1, 1), 12*45, 12, 12): 0,
     }
 
-    
-
     # 2nd layer data with skew adjustments
     if layer == 2:
         if curve is None: 
@@ -495,7 +493,7 @@ def plot_ON_ex5():
     z = [adv_cv_1.rate(date, days=1).real for date in x]
     y = [adv_cv_2.rate(date, days=1).real for date in x]
     ax.plot(x, z, label=f'Layer-1')
-    ax.plot(x, y, label=f'Layer-2')
+    ax.plot(x, y, label=f'Layer-2 (Layer1 + skewed long end)')
     # ax.set_xlim(datetime(2023,1,1),datetime(2024,9,30))
     # ax.set_ylim(2.3,2.75)
     plt.xticks(rotation=90)

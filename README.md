@@ -18,6 +18,15 @@ A compact Python library for swap curve construction, discount curve calibration
 - **Linear** gives an upward slope between knots (straight line segments).
 - **Mixed** gives a smooth curve between knots (B-spline) and falls back to log-linear before the first knot.
 
+### Layered curve with Mixed cubic interpolation, turns and curvature constraints
+- 1st-layer is built with Turns on meeting dates 
+- Curvature constraint enforced as 2nd derivative = 0 on MPC dates via
+  `SwapSpread(SwapSpread(mpc_1, mpc_2), SwapSpread(mpc_2, mpc_3)): 0`
+- 2nd-layer swaps from 4y, 6y, 8y, 9y, 12y, 35y (skew adjustments on long end) are added using:
+  - `skews_layer_2 = {Swap(...): value, ...}`
+
+<img src="./images/advanced_curve6.png" alt="Mixed cubic + log-linear + turns + 2-layer skews" height="400px" width="1000px" />
+
 <table>
   <tr>
     <td><strong>3Y O/N RFR curve (mixed interpolation)</strong><br/><img src="./images/advanced_curve1.png" alt="O/N RFR curve" height="300px" width="500px" /></td>
