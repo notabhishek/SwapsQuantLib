@@ -160,7 +160,7 @@ def plot_ON_ex3():
     plt.legend()
     plt.show()
 
-def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
+def get_testdata_with_curvature_conds(include_curvature_conds: bool = False, layer: int = 1, curve: AdvancedCurve = None):
     nodes_short = {
         datetime(2022, 1, 1): 1.00,  # today's DF
         datetime(2022, 2, 3): 1.00,  # defined MPC dates..
@@ -362,6 +362,51 @@ def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
         SwapSpread(SwapSpread(mpc_22, mpc_23), SwapSpread(mpc_23, mpc_24)): 0,
         SwapSpread(SwapSpread(mpc_23, mpc_24), SwapSpread(mpc_24, mpc_25)): 0,
     }
+
+    # layer 2 data
+    nodes_2 = {**nodes_short, **{
+        datetime(2025, 3, 19): 1.00,  # long term tenors..
+        datetime(2026, 3, 17): 1.00,
+        datetime(2027, 3, 17): 1.00,
+        datetime(2028, 3, 15): 1.00,
+        datetime(2029, 3, 17): 1.00,
+        datetime(2030, 3, 17): 1.00,
+        datetime(2031, 3, 17): 1.00,
+        datetime(2032, 3, 15): 1.00,
+        datetime(2034, 3, 15): 1.00,
+        datetime(2037, 3, 15): 1.00,
+        datetime(2042, 3, 15): 1.00,
+        datetime(2047, 3, 15): 1.00,
+        datetime(2052, 3, 15): 1.00,
+        datetime(2057, 3, 15): 1.00,
+        datetime(2062, 3, 15): 1.00,
+        datetime(2067, 3, 15): 1.00,
+        datetime(2072, 3, 15): 1.00,
+    }}
+    skews_layer_2 = {
+        Swap(datetime(2022, 1, 1), 12*4, 12, 12): -0.0015,
+        Swap(datetime(2022, 1, 1), 12*6, 12, 12): +0.0015,
+        Swap(datetime(2022, 1, 1), 12*8, 12, 12): -0.0005,
+        Swap(datetime(2022, 1, 1), 12*9, 12, 12): -0.0005,
+        Swap(datetime(2022, 1, 1), 12*12, 12, 12): -0.001,
+        Swap(datetime(2022, 1, 1), 12*25, 12, 12): 0,
+        Swap(datetime(2022, 1, 1), 12*35, 12, 12): -0.0005,
+        Swap(datetime(2022, 1, 1), 12*45, 12, 12): 0,
+    }
+
+    
+
+    # 2nd layer data with skew adjustments
+    if layer == 2:
+        if curve is None: 
+            raise ValueError('Need a curve to solve for swap rates for layer-2 data')
+        nodes_dual_2 = {k: Dual(v, {f"v{i}": 1}) for i, (k,v) in enumerate(nodes_2.items())}
+        swaps_layer_2 = {swap: swap.rate(curve).real + skew for (swap, skew) in skews_layer_2.items()}
+        swaps_2 = {**ini_swaps, **swaps_layer_2, **turns, **curvature_conds}
+        weights_2 = [1]*(len(ini_swaps)+len(swaps_layer_2)+len(turns)) + [0.0001]*len(curvature_conds)
+        return nodes_dual_2, swaps_2, weights_2
+    
+    # layer 1 data
     swaps = {**ini_swaps, **turns, **curvature_conds} if include_curvature_conds else {**ini_swaps, **turns}
     w = [1] * (len(ini_swaps) + len(turns))
     # 0.0001 weight for curvature conditions
@@ -392,14 +437,85 @@ def plot_ON_ex4(include_curvature_conds: bool = True):
     plt.legend()
     plt.show()
 
+# AdvancedCurve with log-cubic interpolation
+def plot_ON_ex5():
+    nodes_dual, swaps, wts = get_testdata_with_curvature_conds(include_curvature_conds=True)
+
+    t_layer_1 = [
+        datetime(2025, 3, 19), datetime(2025, 3, 19), datetime(2025, 3, 19), datetime(2025, 3, 19),
+        datetime(2027, 3, 15),
+        datetime(2029, 3, 15),
+        datetime(2032, 3, 15),
+        datetime(2037, 3, 15),
+        datetime(2042, 3, 15),
+        datetime(2052, 3, 15),
+        datetime(2062, 3, 15),
+        datetime(2072, 3, 15), datetime(2072, 3, 15), datetime(2072, 3, 15), datetime(2072, 3, 15),
+    ]
+
+    adv_cv_1 = AdvancedCurve(
+        nodes=nodes_dual, interpolation="log_linear", 
+        swaps=list(swaps.keys()), obj_rates=list(swaps.values()), t=t_layer_1,
+        optimization_algo="levenberg_marquardt", 
+        w=wts,
+    )
+    print(adv_cv_1.iterate())   
+
+    # Build layer-2 curve 
+    t_layer_2 = [
+        datetime(2025, 3, 19), datetime(2025, 3, 19), datetime(2025, 3, 19), datetime(2025, 3, 19),
+        datetime(2026, 3, 15),  # 4y
+        datetime(2027, 3, 15),
+        datetime(2028, 3, 15),  # 6y
+        datetime(2029, 3, 15), 
+        datetime(2030, 3, 15),  # 8y
+        datetime(2031, 3, 15),  # 9y
+        datetime(2032, 3, 15),
+        datetime(2034, 3, 15),  # 12y
+        datetime(2037, 3, 15),
+        datetime(2042, 3, 15),
+        datetime(2047, 3, 15),  # 25y
+        datetime(2052, 3, 15),
+        datetime(2057, 3, 15),  # 35y
+        datetime(2062, 3, 15),
+        datetime(2067, 3, 15),  # 45y
+        datetime(2072, 3, 15), datetime(2072, 3, 15), datetime(2072, 3, 15), datetime(2072, 3, 15),
+    ]
+    nodes_dual2, swaps2, wts2 = get_testdata_with_curvature_conds(include_curvature_conds=True, layer=2, curve=adv_cv_1)
+    adv_cv_2 = AdvancedCurve(
+        nodes=nodes_dual2, interpolation="log_linear", 
+        swaps=list(swaps2.keys()), obj_rates=list(swaps2.values()), t=t_layer_2,
+        optimization_algo="levenberg_marquardt", 
+        w=wts2,
+    )
+    print(adv_cv_2.iterate())  
+
+    fig, ax = plt.subplots()
+    x = [datetime(2022,1,1) + i * timedelta(days=1) for i in range(365*10)]
+    z = [adv_cv_1.rate(date, days=1).real for date in x]
+    y = [adv_cv_2.rate(date, days=1).real for date in x]
+    ax.plot(x, z, label=f'Layer-1')
+    ax.plot(x, y, label=f'Layer-2')
+    # ax.set_xlim(datetime(2023,1,1),datetime(2024,9,30))
+    # ax.set_ylim(2.3,2.75)
+    plt.xticks(rotation=90)
+    plt.title('O/N RFR (2-layer Mixed Interpolation with Turns & Curvature conditions)')
+    plt.xlabel('Date')
+    plt.ylabel('RFR(%)')
+    plt.legend()
+    plt.show()
+
 if __name__ == '__main__':
-    # # 3Y RFR curves
-    # plot_on_ex1()
-    # # 10Y RFR curves
-    # plot_on_ex2()
-    # # log-linear curve with turns
-    # plot_ON_ex3()
+    # 3Y RFR curves
+    plot_on_ex1()
+    # 10Y RFR curves
+    plot_on_ex2()
+    # log-linear curve with turns
+    plot_ON_ex3()
 
     # log-linear curve with and without curvature constraints
     plot_ON_ex4(include_curvature_conds=False)
     plot_ON_ex4(include_curvature_conds=True)
+
+    # Plot 2 layer curve with Turns, Mixed interp & curvature constraints
+    plot_ON_ex5()
