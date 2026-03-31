@@ -10,7 +10,10 @@ A compact Python library for swap curve construction, discount curve calibration
   - **Log-linear** (flat between knots, step-wise)
   - **Linear** (piecewise linear with elbows at knots)
   - **Mixed** (cubic B-spline + log-linear fallback before first knot)
-- Automatic Differentiation via custom `Dual` numbers to compute sensitivities and optimize efficiently.
+- **Turns** and **Curvature constraints** support via SwapSpread instruments
+- **Weighted optimization**, pass weights to prefer repricing some instruments over others
+- **Layered curves**, caliberate using some instruments and then recaliberate with additional instrume
+- **Risk**: Risk using automatic Differentiation via custom `Dual` numbers to compute sensitivities and optimize efficiently.
 - Swap and schedule support: build payment dates, fixed/float legs, and par-rate computations.
 
 ## Curve calibration and swap outputs
