@@ -42,7 +42,7 @@ def plot_curve(curve: SolvedCurve):
     start_date = datetime(2022, 1, 1)
     
     nodes, market_swaps = get_test_data()
-    market_tenors = [swap.tenor_m for swap in market_swaps.keys()]
+    market_tenors = [swap.tenor for swap in market_swaps.keys()]
     market_rates = [rate.real for rate in market_swaps.values()]
 
     implied_tenors = []
@@ -52,7 +52,7 @@ def plot_curve(curve: SolvedCurve):
     curve.iterate()
 
     for m in range(1, 50 * 12 + 1):
-        swap = Swap(start_date, tenor_m=m, period_fix_m=12, period_float_m=12)
+        swap = Swap(start_date, tenor=m, period_fix=12, period_float=12)
         implied_tenors.append(m)
         implied_rates.append(swap.rate(curve).real)
 

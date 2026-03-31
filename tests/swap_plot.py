@@ -23,7 +23,7 @@ par_rates_log_linear = []
 par_rates_linear = []
 for m in range(1, 50 * 12 + 1):
     # Annual swap with tenor m months
-    swap = Swap(start_date, tenor_m=m, period_fix_m=12, period_float_m=12)
+    swap = Swap(start_date, tenor=m, period_fix=12, period_float=12)
     tenors.append(m)
     par_rates_log_linear.append(swap.rate(curve_log_linear))
     par_rates_linear.append(swap.rate(curve_linear))

@@ -8,7 +8,7 @@ curve = Curve(interpolation='log_linear', nodes = {
     datetime(2022, 7, 1) : 0.9945,
 })
 
-swap = Swap(datetime(2022, 2, 14), tenor_m=4, period_fix_m=12, period_float_m=1)
+swap = Swap(datetime(2022, 2, 14), tenor=4, period_fix=12, period_float=1)
 
 print(swap)
 

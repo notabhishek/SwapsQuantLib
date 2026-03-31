@@ -1,16 +1,25 @@
 from datetime import datetime 
-from core.schedule import add_months_modfollowing, Schedule
+from core.schedule import add_months_modfollowing, add_days, Schedule
 from core.curve import Curve
 from core.solvedcurve import SolvedCurve
 import numpy as np 
 
 class Swap: 
-    def __init__(self, start: datetime, tenor_m: int, period_fix_m: int, period_float_m: int):
+    def __init__(self, start: datetime, tenor: int, period_fix: int, period_float: int, tenor_type: str = 'M'):
         self.start = start 
-        self.end = add_months_modfollowing(start, tenor_m)
-        self.schedule_fix = Schedule(start, tenor_m, period_fix_m)
-        self.schedule_float = Schedule(start, tenor_m, period_float_m)
-        self.tenor_m = tenor_m
+
+        # TODO: add tenor_type W, Y
+        if tenor_type == 'M':
+            self.add_op = add_months_modfollowing
+        elif tenor_type == 'D':
+            self.add_op == add_days
+        else: 
+            raise ValueError(f'Only support tenor_type D, M but got {tenor_type}')
+        
+        self.end = self.add_op(start, tenor)
+        self.schedule_fix = Schedule(start, tenor, period_fix, tenor_type=tenor_type)
+        self.schedule_float = Schedule(start, tenor, period_float, tenor_type=tenor_type)
+        self.tenor = tenor
     
     def __repr__(self):
         format = '%Y-%b-%d'
