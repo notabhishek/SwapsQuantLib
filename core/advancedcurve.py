@@ -4,8 +4,8 @@ from datetime import datetime
 import numpy as np
 
 class AdvancedCurve(SolvedCurve):
-    def __init__(self, nodes: dict, interpolation: str, swaps: list, obj_rates: list, t: list, optimization_algo: str = 'guass_newton'):
-        super().__init__(nodes, interpolation, swaps, obj_rates, optimization_algo)
+    def __init__(self, nodes: dict, interpolation: str, swaps: list, obj_rates: list, t: list, optimization_algo: str = 'guass_newton', w: list = None):
+        super().__init__(nodes, interpolation, swaps, obj_rates, optimization_algo, w)
         
         # Knot sequence of dates
         self.t = t 
