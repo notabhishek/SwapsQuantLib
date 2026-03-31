@@ -17,7 +17,7 @@ Use market observed swap rates to caliberate the discount curve and then plot O/
 ##### Example: Caliberated with 1Y,2Y,3Y swaps starting 2022-1-1
 Notice: mixed interpolation falls back to log-linear before first knot 2023-1-1
 
-<img src="./images/advanced_curve1.png" alt="O/N RFR curve" height="400px" width="800px"/>
+<img src="./images/advanced_curve1.png" alt="O/N RFR curve" height="300px" width="500px"/>
 
 ##### Exampe2: 10Y curve
 <img src="./images/advanced_curve2.png" alt="O/N RFR curve" height="500px" width="`1000px"/>
