@@ -30,16 +30,17 @@ A compact Python library for swap curve construction, discount curve calibration
 
 <img src="./images/advanced_curve3.png" alt="Curve with turns and swap spread" height="300px" width="500px" />
 
-### Log-linear SONIA curves with and without curvature constraints
+### Log-linear SONIA curves with turns and curvature constraints
+- Turns on meeting dates
 - Curvature constraint enforced as 2nd derivative = 0 on MPC dates via
   `SwapSpread(SwapSpread(mpc_1, mpc_2), SwapSpread(mpc_2, mpc_3)): 0`
 
-<!-- <table>
+<table>
   <tr>
     <td><strong>No curvature constraints</strong><br/><img src="./images/advanced_curve4.png" alt="Log-linear with no curvature constraints" height="300px" width="500px" /></td>
     <td><strong>With curvature constraints</strong><br/><img src="./images/advanced_curve5.png" alt="Log-linear with curvature constraints" height="300px" width="500px" /></td>
   </tr>
-</table> -->
+</table>
 
 ## B-spline implementation (visible, all key plots)
 - B-spline basis generation (orders 1–4)
