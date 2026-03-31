@@ -161,24 +161,40 @@ def plot_ON_ex3():
     plt.show()
 
 def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
-    nodes = {
+    nodes_short = {
         datetime(2022, 1, 1): 1.00,  # today's DF
         datetime(2022, 2, 3): 1.00,  # defined MPC dates..
         datetime(2022, 3, 17): 1.00,
+        datetime(2022, 3, 31): 1.00, # turn1
+        datetime(2022, 4, 1): 1.00,  # turn1
         datetime(2022, 5, 5): 1.00,
         datetime(2022, 6, 16): 1.00,
+        datetime(2022, 6, 30): 1.00, # turn2
+        datetime(2022, 7, 1): 1.00,  # turn2
         datetime(2022, 8, 4): 1.00,
         datetime(2022, 9, 15): 1.00,
+        datetime(2022, 9, 30): 1.00,  # turn3
+        datetime(2022, 10, 1): 1.00,  # turn3
         datetime(2022, 11, 3): 1.00,
         datetime(2022, 12, 15): 1.00,
+        datetime(2022, 12, 31): 1.00, # turn4
+        datetime(2023, 1, 1): 1.00,  # turn4
         datetime(2023, 2, 2): 1.00,  # provisional MPC dates..
         datetime(2023, 3, 23): 1.00,
+        datetime(2023, 3, 31): 1.00, # turn5
+        datetime(2023, 4, 1): 1.00,  # turn5
         datetime(2023, 5, 11): 1.00,
         datetime(2023, 6, 22): 1.00,
+        datetime(2023, 6, 30): 1.00,  # turn6
+        datetime(2023, 7, 1): 1.00,  # turn6
         datetime(2023, 8, 3): 1.00,
         datetime(2023, 9, 21): 1.00,
+        datetime(2023, 9, 30): 1.00,  # turn7
+        datetime(2023, 10, 1): 1.00,  # turn7
         datetime(2023, 11, 2): 1.00,
         datetime(2023, 12, 14): 1.00,
+        datetime(2023, 12, 31): 1.00,  # turn8
+        datetime(2024, 1, 1): 1.00,  # turn8
         datetime(2024, 2, 8): 1.00,  # estimated MPC dates..
         datetime(2024, 3, 21): 1.00,
         datetime(2024, 5, 16): 1.00,
@@ -186,7 +202,9 @@ def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
         datetime(2024, 8, 8): 1.00,
         datetime(2024, 9, 19): 1.00,
         datetime(2024, 11, 7): 1.00,
-        datetime(2024, 12, 12): 1.00,
+        datetime(2024, 12, 12): 1.00
+    }
+    nodes_long = {
         datetime(2025, 3, 19): 1.00,  # long term tenors..
         datetime(2027, 3, 17): 1.00,
         datetime(2029, 3, 15): 1.00,
@@ -197,6 +215,7 @@ def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
         datetime(2062, 3, 15): 1.00,
         datetime(2072, 3, 15): 1.00,
     }
+    nodes = {**nodes_short, **nodes_long}
     nodes_dual = {k: Dual(v, {f"v{i}": 1}) for i, (k,v) in enumerate(nodes.items())}
 
     ini_swaps = {
@@ -224,6 +243,74 @@ def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
         Swap(datetime(2022, 1, 1), 12*50, 12, 12): 2.09,
     }
 
+    # turns
+    turns = {
+        SwapSpread(
+            Swap(datetime(2022, 3, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 3, 31), 1, 1, 1, tenor_type = 'D'),
+        ): -0.03,
+        SwapSpread(
+            Swap(datetime(2022, 3, 31), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 4, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.03,  # turn 1
+        SwapSpread(
+            Swap(datetime(2022, 6, 29), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 6, 30), 1, 1, 1, tenor_type = 'D'),
+        ): -0.05,
+        SwapSpread(
+            Swap(datetime(2022, 6, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 7, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.05,  # turn 2
+        SwapSpread(
+            Swap(datetime(2022, 9, 29), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 9, 30), 1, 1, 1, tenor_type = 'D'),
+        ): -0.03,
+        SwapSpread(
+            Swap(datetime(2022, 9, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 10, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.03,  # turn 3
+        SwapSpread(
+            Swap(datetime(2022, 12, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2022, 12, 31), 1, 1, 1, tenor_type = 'D'),
+        ): -0.05,
+        SwapSpread(
+            Swap(datetime(2022, 12, 31), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 1, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.05,  # turn 4
+        SwapSpread(
+            Swap(datetime(2023, 3, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 3, 31), 1, 1, 1, tenor_type = 'D'),
+        ): -0.03,
+        SwapSpread(
+            Swap(datetime(2023, 3, 31), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 4, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.03,  # turn 5
+        SwapSpread(
+            Swap(datetime(2023, 6, 29), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 6, 30), 1, 1, 1, tenor_type = 'D'),
+        ): -0.05,
+        SwapSpread(
+            Swap(datetime(2023, 6, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 7, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.05,  # turn 6
+        SwapSpread(
+            Swap(datetime(2023, 9, 29), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 9, 30), 1, 1, 1, tenor_type = 'D'),
+        ): -0.03,
+        SwapSpread(
+            Swap(datetime(2023, 9, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 10, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.03,  # turn 7
+        SwapSpread(
+            Swap(datetime(2023, 12, 30), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2023, 12, 31), 1, 1, 1, tenor_type = 'D'),
+        ): -0.05,
+        SwapSpread(
+            Swap(datetime(2023, 12, 31), 1, 1, 1, tenor_type = 'D'),
+            Swap(datetime(2024, 1, 1), 1, 1, 1, tenor_type = 'D'),
+        ): 0.05,  # turn 8
+    }
+    
     mpc_1 = Swap(datetime(2022, 2, 3), 1, 1, 1, tenor_type = 'D')
     mpc_2 = Swap(datetime(2022, 3, 17), 1, 1, 1, tenor_type = 'D')
     mpc_3 = Swap(datetime(2022, 5, 5), 1, 1, 1, tenor_type = 'D')
@@ -275,16 +362,21 @@ def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
         SwapSpread(SwapSpread(mpc_22, mpc_23), SwapSpread(mpc_23, mpc_24)): 0,
         SwapSpread(SwapSpread(mpc_23, mpc_24), SwapSpread(mpc_24, mpc_25)): 0,
     }
-    swaps = {**ini_swaps, **curvature_conds} if include_curvature_conds else ini_swaps
-    return nodes_dual, swaps
+    swaps = {**ini_swaps, **turns, **curvature_conds} if include_curvature_conds else {**ini_swaps, **turns}
+    w = [1] * (len(ini_swaps) + len(turns))
+    # 0.0001 weight for curvature conditions
+    if include_curvature_conds: 
+        w.extend([0.0001] * len(curvature_conds))
+    return nodes_dual, swaps, w
 
 def plot_ON_ex4(include_curvature_conds: bool = True):
     # Solved curve without curvature constraints
-    nodes_dual, swaps = get_testdata_with_curvature_conds(include_curvature_conds=include_curvature_conds)
+    nodes_dual, swaps, wts = get_testdata_with_curvature_conds(include_curvature_conds=include_curvature_conds)
     ini_s_cv = SolvedCurve(
         nodes=nodes_dual, interpolation="log_linear", 
         swaps=list(swaps.keys()), obj_rates=list(swaps.values()),
-        optimization_algo="levenberg_marquardt", 
+        optimization_algo="levenberg_marquardt",
+        w=wts 
     )
     print(ini_s_cv.iterate())   
     fig, ax = plt.subplots()
@@ -301,12 +393,12 @@ def plot_ON_ex4(include_curvature_conds: bool = True):
     plt.show()
 
 if __name__ == '__main__':
-    # 3Y RFR curves
-    plot_on_ex1()
-    # 10Y RFR curves
-    plot_on_ex2()
-    # log-linear curve with turns
-    plot_ON_ex3()
+    # # 3Y RFR curves
+    # plot_on_ex1()
+    # # 10Y RFR curves
+    # plot_on_ex2()
+    # # log-linear curve with turns
+    # plot_ON_ex3()
 
     # log-linear curve with and without curvature constraints
     plot_ON_ex4(include_curvature_conds=False)
