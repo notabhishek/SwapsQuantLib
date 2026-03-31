@@ -92,7 +92,7 @@ if __name__ == '__main__':
     # plt.title(f'Plot of B-splines of order 1<=k<={k} for knot seq t={t}')
     # plot_splines_for(k=k, t = t)
     
-    plt.title(f'Plot of B-splines derivatives of order 1<=k<={k} for knot seq t={t}')
+    plt.title(f'Plot of f = d(Bi,k={k},t)/dx for knot seq t={t}')
     plot_splines_derivative_for(k=k, t=t)
 
     plt.show()

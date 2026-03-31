@@ -64,3 +64,7 @@ Plotting B-Splines of order 1 to 4, for t = [1, 1, 1, 1, 2, 3, 4, 5, 6, 6, 6, 6]
 without repeated knots 
 
 <img src="./images/bspline_plot2.png" alt="Bsplines with repeated knots" height="600px" width="800px" />
+
+Plotting first derivatives of d(Bi,k=4,t)/dx for knot seq t=[1, 1, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4]
+
+<img src="./images/bspline_der_plot.png" alt="BSpline derivatives" height="400px" width="400px" />
