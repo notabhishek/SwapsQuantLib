@@ -160,7 +160,154 @@ def plot_ON_ex3():
     plt.legend()
     plt.show()
 
+def get_testdata_with_curvature_conds(include_curvature_conds: bool = False):
+    nodes = {
+        datetime(2022, 1, 1): 1.00,  # today's DF
+        datetime(2022, 2, 3): 1.00,  # defined MPC dates..
+        datetime(2022, 3, 17): 1.00,
+        datetime(2022, 5, 5): 1.00,
+        datetime(2022, 6, 16): 1.00,
+        datetime(2022, 8, 4): 1.00,
+        datetime(2022, 9, 15): 1.00,
+        datetime(2022, 11, 3): 1.00,
+        datetime(2022, 12, 15): 1.00,
+        datetime(2023, 2, 2): 1.00,  # provisional MPC dates..
+        datetime(2023, 3, 23): 1.00,
+        datetime(2023, 5, 11): 1.00,
+        datetime(2023, 6, 22): 1.00,
+        datetime(2023, 8, 3): 1.00,
+        datetime(2023, 9, 21): 1.00,
+        datetime(2023, 11, 2): 1.00,
+        datetime(2023, 12, 14): 1.00,
+        datetime(2024, 2, 8): 1.00,  # estimated MPC dates..
+        datetime(2024, 3, 21): 1.00,
+        datetime(2024, 5, 16): 1.00,
+        datetime(2024, 6, 20): 1.00,
+        datetime(2024, 8, 8): 1.00,
+        datetime(2024, 9, 19): 1.00,
+        datetime(2024, 11, 7): 1.00,
+        datetime(2024, 12, 12): 1.00,
+        datetime(2025, 3, 19): 1.00,  # long term tenors..
+        datetime(2027, 3, 17): 1.00,
+        datetime(2029, 3, 15): 1.00,
+        datetime(2032, 3, 15): 1.00,
+        datetime(2037, 3, 15): 1.00,
+        datetime(2042, 3, 15): 1.00,
+        datetime(2052, 3, 15): 1.00,
+        datetime(2062, 3, 15): 1.00,
+        datetime(2072, 3, 15): 1.00,
+    }
+    nodes_dual = {k: Dual(v, {f"v{i}": 1}) for i, (k,v) in enumerate(nodes.items())}
+
+    ini_swaps = {
+        Swap(datetime(2022, 1, 1), 34, 34, 34, tenor_type='D'): 0.695,
+        Swap(datetime(2022, 2, 3), 42, 42, 42, tenor_type='D'): 0.95,
+        Swap(datetime(2022, 3, 16), 3, 3, 3): 1.40,
+        Swap(datetime(2022, 6, 15), 3, 3, 3): 1.89,
+        Swap(datetime(2022, 9, 16), 3, 3, 3): 2.245,
+        Swap(datetime(2022, 12, 21), 3, 3, 3): 2.53,
+        Swap(datetime(2023, 3, 15), 3, 3, 3): 2.69,
+        Swap(datetime(2023, 6, 21), 3, 3, 3): 2.69,
+        Swap(datetime(2023, 9, 20), 3, 3, 3): 2.62,
+        Swap(datetime(2023, 12, 20), 3, 3, 3): 2.5,
+        Swap(datetime(2024, 3, 20), 3, 3, 3): 2.375,
+        Swap(datetime(2024, 6, 19), 3, 3, 3): 2.27,
+        Swap(datetime(2024, 9, 18), 3, 3, 3): 2.215,
+        Swap(datetime(2024, 12, 18), 3, 3, 3): 2.17,
+        Swap(datetime(2022, 1, 1), 12*5, 12, 12): 2.195,
+        Swap(datetime(2022, 1, 1), 12*7, 12, 12): 2.193,
+        Swap(datetime(2022, 1, 1), 12*10, 12, 12): 2.186,
+        Swap(datetime(2022, 1, 1), 12*15, 12, 12): 2.181,
+        Swap(datetime(2022, 1, 1), 12*20, 12, 12): 2.162,
+        Swap(datetime(2022, 1, 1), 12*30, 12, 12): 2.12,
+        Swap(datetime(2022, 1, 1), 12*40, 12, 12): 2.10,
+        Swap(datetime(2022, 1, 1), 12*50, 12, 12): 2.09,
+    }
+
+    mpc_1 = Swap(datetime(2022, 2, 3), 1, 1, 1, tenor_type = 'D')
+    mpc_2 = Swap(datetime(2022, 3, 17), 1, 1, 1, tenor_type = 'D')
+    mpc_3 = Swap(datetime(2022, 5, 5), 1, 1, 1, tenor_type = 'D')
+    mpc_4 = Swap(datetime(2022, 6, 16), 1, 1, 1, tenor_type = 'D')
+    mpc_5 = Swap(datetime(2022, 8, 4), 1, 1, 1, tenor_type = 'D')
+    mpc_6 = Swap(datetime(2022, 9, 15), 1, 1, 1, tenor_type = 'D')
+    mpc_7 = Swap(datetime(2022, 11, 3), 1, 1, 1, tenor_type = 'D')
+    mpc_8 = Swap(datetime(2022, 12, 15), 1, 1, 1, tenor_type = 'D')
+    mpc_9 = Swap(datetime(2023, 2, 2), 1, 1, 1, tenor_type = 'D')
+    mpc_10 = Swap(datetime(2023, 3, 23), 1, 1, 1, tenor_type = 'D')
+    mpc_11 = Swap(datetime(2023, 5, 11), 1, 1, 1, tenor_type = 'D')
+    mpc_12 = Swap(datetime(2023, 6, 22), 1, 1, 1, tenor_type = 'D')
+    mpc_13 = Swap(datetime(2023, 8, 3), 1, 1, 1, tenor_type = 'D')
+    mpc_14 = Swap(datetime(2023, 9, 21), 1, 1, 1, tenor_type = 'D')
+    mpc_15 = Swap(datetime(2023, 11, 2), 1, 1, 1, tenor_type = 'D')
+    mpc_16 = Swap(datetime(2023, 12, 14), 1, 1, 1, tenor_type = 'D')
+    mpc_17 = Swap(datetime(2024, 2, 8), 1, 1, 1, tenor_type = 'D')
+    mpc_18 = Swap(datetime(2024, 3, 21), 1, 1, 1, tenor_type = 'D')
+    mpc_19 = Swap(datetime(2024, 5, 16), 1, 1, 1, tenor_type = 'D')
+    mpc_20 = Swap(datetime(2024, 6, 20), 1, 1, 1, tenor_type = 'D')
+    mpc_21 = Swap(datetime(2024, 8, 8), 1, 1, 1, tenor_type = 'D')
+    mpc_22 = Swap(datetime(2024, 9, 19), 1, 1, 1, tenor_type = 'D')
+    mpc_23 = Swap(datetime(2024, 11, 7), 1, 1, 1, tenor_type = 'D')
+    mpc_24 = Swap(datetime(2024, 12, 12), 1, 1, 1, tenor_type = 'D')
+    mpc_25 = Swap(datetime(2025, 3, 20), 1, 1, 1, tenor_type = 'D')
+
+    curvature_conds = {
+        SwapSpread(SwapSpread(mpc_1, mpc_2), SwapSpread(mpc_2, mpc_3)): 0,
+        SwapSpread(SwapSpread(mpc_2, mpc_3), SwapSpread(mpc_3, mpc_4)): 0,
+        SwapSpread(SwapSpread(mpc_3, mpc_4), SwapSpread(mpc_4, mpc_5)): 0,
+        SwapSpread(SwapSpread(mpc_4, mpc_5), SwapSpread(mpc_5, mpc_6)): 0,
+        SwapSpread(SwapSpread(mpc_5, mpc_6), SwapSpread(mpc_6, mpc_7)): 0,
+        SwapSpread(SwapSpread(mpc_6, mpc_7), SwapSpread(mpc_7, mpc_8)): 0,
+        SwapSpread(SwapSpread(mpc_7, mpc_8), SwapSpread(mpc_8, mpc_9)): 0,
+        SwapSpread(SwapSpread(mpc_8, mpc_9), SwapSpread(mpc_9, mpc_10)): 0,
+        SwapSpread(SwapSpread(mpc_9, mpc_10), SwapSpread(mpc_10, mpc_11)): 0,
+        SwapSpread(SwapSpread(mpc_10, mpc_11), SwapSpread(mpc_11, mpc_12)): 0,
+        SwapSpread(SwapSpread(mpc_11, mpc_12), SwapSpread(mpc_12, mpc_13)): 0,
+        SwapSpread(SwapSpread(mpc_12, mpc_13), SwapSpread(mpc_13, mpc_14)): 0,
+        SwapSpread(SwapSpread(mpc_13, mpc_14), SwapSpread(mpc_14, mpc_15)): 0,
+        SwapSpread(SwapSpread(mpc_14, mpc_15), SwapSpread(mpc_15, mpc_16)): 0,
+        SwapSpread(SwapSpread(mpc_15, mpc_16), SwapSpread(mpc_16, mpc_17)): 0,
+        SwapSpread(SwapSpread(mpc_16, mpc_17), SwapSpread(mpc_17, mpc_18)): 0,
+        SwapSpread(SwapSpread(mpc_17, mpc_18), SwapSpread(mpc_18, mpc_19)): 0,
+        SwapSpread(SwapSpread(mpc_18, mpc_19), SwapSpread(mpc_19, mpc_20)): 0,
+        SwapSpread(SwapSpread(mpc_19, mpc_20), SwapSpread(mpc_20, mpc_21)): 0,
+        SwapSpread(SwapSpread(mpc_20, mpc_21), SwapSpread(mpc_21, mpc_22)): 0,
+        SwapSpread(SwapSpread(mpc_21, mpc_22), SwapSpread(mpc_22, mpc_23)): 0,
+        SwapSpread(SwapSpread(mpc_22, mpc_23), SwapSpread(mpc_23, mpc_24)): 0,
+        SwapSpread(SwapSpread(mpc_23, mpc_24), SwapSpread(mpc_24, mpc_25)): 0,
+    }
+    swaps = {**ini_swaps, **curvature_conds} if include_curvature_conds else ini_swaps
+    return nodes_dual, swaps
+
+def plot_ON_ex4(include_curvature_conds: bool = True):
+    # Solved curve without curvature constraints
+    nodes_dual, swaps = get_testdata_with_curvature_conds(include_curvature_conds=include_curvature_conds)
+    ini_s_cv = SolvedCurve(
+        nodes=nodes_dual, interpolation="log_linear", 
+        swaps=list(swaps.keys()), obj_rates=list(swaps.values()),
+        optimization_algo="levenberg_marquardt", 
+    )
+    print(ini_s_cv.iterate())   
+    fig, ax = plt.subplots()
+    x = [datetime(2022,1,1) + i * timedelta(days=1) for i in range(365*10)]
+    z = [ini_s_cv.rate(date, days=1).real for date in x]
+    ax.plot(x, z, label=f'Includes curvature constraints:{include_curvature_conds}')
+    # ax.set_xlim(datetime(2023,1,1),datetime(2024,9,30))
+    # ax.set_ylim(2.3,2.75)
+    plt.xticks(rotation=90)
+    plt.title('O/N forward RF rates(log-linear)')
+    plt.xlabel('Date')
+    plt.ylabel('RFR(%)')
+    plt.legend()
+    plt.show()
+
 if __name__ == '__main__':
+    # 3Y RFR curves
     plot_on_ex1()
+    # 10Y RFR curves
     plot_on_ex2()
+    # log-linear curve with turns
     plot_ON_ex3()
+
+    # log-linear curve with and without curvature constraints
+    plot_ON_ex4(include_curvature_conds=False)
+    plot_ON_ex4(include_curvature_conds=True)
