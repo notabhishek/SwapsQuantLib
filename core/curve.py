@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 from core.mathutils import interpolate
 from core.swap import add_months_modfollowing
+from copy import deepcopy
 
 class Curve:
     """
     nodes: { datetime: discount_factor }
     """
     def __init__(self, nodes: dict, interpolation: str):
-        self.nodes = nodes.copy()
+        self.nodes = deepcopy(nodes)
         self.node_dates = list(self.nodes.keys())
         self.interpolation = interpolation
     
