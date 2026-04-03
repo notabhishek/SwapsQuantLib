@@ -40,6 +40,7 @@ trying to minimize
 
 import numpy as np 
 from core.curve import Curve
+from copy import deepcopy
 
 class SolvedCurve(Curve):
     def __init__(self, 
@@ -207,7 +208,16 @@ class SolvedCurve(Curve):
 
 
     # Solve Grad_s(v) numerically using forward finite difference method
-    def grad_s_v_numeric(self):
+    def grad_s_v_numeric(self, **kwargs):
+        kwargs = {
+            'nodes': self.nodes,
+            'interpolation': self.interpolation,
+            'swaps': self.swaps,
+            'obj_rates': self.obj_rates,
+            'optimization_algo': 'guass_newton',
+            'w' : None if self.W is None else np.diagonal(self.W),
+            **kwargs # extra args for advanced curve
+        }
         # grad_s_v i,j is dvi/dvj 
         # 0 <= i < len_s
         # 1 <= j < len_v
@@ -215,12 +225,14 @@ class SolvedCurve(Curve):
         ds = 1e-3 
 
         # solved forward curve 
-        s_cv_fwd = SolvedCurve(nodes=self.nodes, interpolation=self.interpolation, swaps=self.swaps, obj_rates=self.obj_rates, optimization_algo='guass_newton')
+        CurveType=type(self) # To allow using risk on AdvancedCurve
+        s_cv_fwd = CurveType(**kwargs)
+        s_cv_fwd.not_iterated = False
 
         # calculate the small change dv in discount factors(vi) for a small change ds in the ith swap rate
         for s_idx in range(self.len_s):
             # reset the dfs and swap market rates 
-            s_cv_fwd.nodes, s_cv_fwd.s = self.nodes.copy(), self.s.copy()
+            s_cv_fwd.nodes, s_cv_fwd.s = deepcopy(self.nodes), self.s.copy()
             # add small change ds to s_idx'th swap
             s_cv_fwd.s[s_idx, 0] += ds 
 
