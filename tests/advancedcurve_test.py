@@ -488,6 +488,12 @@ def plot_ON_ex5():
     )
     print(adv_cv_2.iterate())  
 
+    # 5y fwd starting 5y swap
+    swap5y5y = Swap(datetime(2027, 1, 1), 12 * 5, 12, 12)
+    risk5y5y = swap5y5y.risk(adv_cv_2, fixed_rate=swap5y5y.rate(adv_cv_2).real, notional=100e6) 
+    print(f'Risk 5Y5Y forward swap {risk5y5y=}')
+
+
     fig, ax = plt.subplots()
     x = [datetime(2022,1,1) + i * timedelta(days=1) for i in range(365*10)]
     z = [adv_cv_1.rate(date, days=1).real for date in x]
