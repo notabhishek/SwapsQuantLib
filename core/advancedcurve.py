@@ -21,6 +21,11 @@ class AdvancedCurve(SolvedCurve):
             # sum of piecewise polynomial sum of bsplines
             return self.bs.ppev_single(date).__exp__()
     
+    def __copy__(self):
+        ret = super().__copy__()
+        ret.bs = copy(self.bs)
+        return ret
+
     def solve_bspline(self):
         # dates and values to use for caliberating 
         tau = [k for k in self.nodes.keys() if k >= self.t[0]]
@@ -48,9 +53,15 @@ class AdvancedCurve(SolvedCurve):
     # LM and then uses guass_newton for next few iterations
     def iterate(self):
         if self.not_iterated:
-            w = None if self.W is None else np.diag(self.W)
+            w = None if self.W is None else np.diagonal(self.W)
             base_solve = SolvedCurve(self.nodes, self.interpolation, self.swaps, self.obj_rates, optimization_algo=self.algo, w=w)
             print('Basic solve:', base_solve.iterate())
             self.nodes = base_solve.nodes
             self.not_iterated, self.algo = False, 'guass_newton'
         return super().iterate()
+
+    @property
+    def grad_s_v(self):
+        if getattr(self, 'grad_s_v_', None) is None: 
+            self.grad_s_v_numeric(t = self.t)
+        return self.grad_s_v_ 
