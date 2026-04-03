@@ -19,6 +19,18 @@ class Curve:
     
     __str__ = __repr__
 
+    def __copy__(self):
+        W = getattr(self, "W", None)
+        return type(self)(
+            nodes=self.nodes,
+            interpolation=self.interpolation,
+            swaps=getattr(self, "swaps", None),
+            optimization_algo=getattr(self, "algo", None),
+            obj_rates=getattr(self, "obj_rates", None),
+            w=None if W is None else np.diagonal(W),
+            t=getattr(self, "t", None),
+        )
+
     # Return discount factor for given date
     def __getitem__(self, date: datetime):
         # find first node_date >= date or use last two dates if date> all node_dates
