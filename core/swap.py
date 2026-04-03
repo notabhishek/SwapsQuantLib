@@ -1,11 +1,14 @@
-from datetime import datetime 
-from core.schedule import add_months_modfollowing, add_days, Schedule
+from core.dateutils import add_months_modfollowing, add_days
+from core.schedule import Schedule
 from core.curve import Curve
 from core.solvedcurve import SolvedCurve
+from core.covar import Covar_
+
+from datetime import datetime 
 import numpy as np 
 
-class Swap: 
-    def __init__(self, start: datetime, tenor: int, period_fix: int, period_float: int, tenor_type: str = 'M'):
+class Swap(Covar_): 
+    def __init__(self, start: datetime, tenor: int, period_fix: int, period_float: int, tenor_type: str = 'M', fixed_rate=):
         self.start = start 
 
         # TODO: add tenor_type W, Y

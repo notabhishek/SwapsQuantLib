@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from core.mathutils import interpolate
-from core.swap import add_months_modfollowing
+from core.dateutils import add_months_modfollowing
 from copy import deepcopy
 
 class Curve:
