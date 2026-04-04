@@ -4,6 +4,8 @@ from core.dual import Dual
 from datetime import datetime, timedelta
 from core.portfolio import Portfolio
 
+import pandas as pd
+
 nodes = {
     datetime(2022, 1, 1): Dual(1, {"v0": 1}),
     datetime(2024, 1, 1): Dual(1, {"v1": 1}),
@@ -33,3 +35,25 @@ portfolio = Portfolio(objects=swaps)
 
 print(f'{portfolio.npv(s_cv).real=}')
 print(f'{portfolio.risk(s_cv).real=}')
+
+# Building covariance matrix
+historical_rates = pd.DataFrame({
+    "2Y": [1.199, 1.228, 1.210, 1.215, 1.203, 1.159, 1.175, 1.188, 1.159, 1.100],
+    "5Y": [1.663, 1.696, 1.665, 1.680, 1.677, 1.657, 1.673, 1.676, 1.653, 1.600],
+    "10Y": [1.928, 1.945, 1.934, 1.93, 1.934, 1.931, 1.958, 1.972, 1.932, 1.900],
+    "30Y": [2.201, 2.217, 2.228, 2.239, 2.226, 2.235, 2.242, 2.236, 2.22, 2.200],
+})
+
+print('Diffs')
+daily_changes_bp = historical_rates.diff(periods=-1) * 100
+print(daily_changes_bp)
+
+Q = daily_changes_bp.cov()
+
+print('Covariance matrix')
+print(Q)
+
+print(f'{portfolio.covar(s_cv, Q)=}')
+print(f'{portfolio.covar(s_cv, Q, alpha=0.05)=}')
+print(f'{portfolio.covar(s_cv, Q, alpha=0.01)=}')
+
