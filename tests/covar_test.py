@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from core.portfolio import Portfolio
 
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np 
 
 nodes = {
     datetime(2022, 1, 1): Dual(1, {"v0": 1}),
@@ -73,7 +75,23 @@ Q = daily_changes_bp.cov()
 print('Covariance matrix')
 print(Q)
 
-print(f'{portfolio.covar(s_cv, Q)=}')
+print(f'c = {portfolio.covar(s_cv, Q)=}')
 print(f'{portfolio.covar(s_cv, Q, alpha=0.05)=}')
 print(f'{portfolio.covar(s_cv, Q, alpha=0.01)=}')
 
+x = [i for i in range(50, 100)]
+y = [portfolio.covar(s_cv, Q, alpha=(1-xi/100)) for xi in x]
+
+key_x = [80, 90, 95, 99]
+key_y = [portfolio.covar(s_cv, Q, alpha=(1-xi/100)) for xi in key_x]
+
+
+plt.plot(np.array(x), np.array(y), label='Portfolio loss vs c.i')
+plt.scatter(key_x, key_y, label='Key CI')
+
+plt.xlabel('Confidence interval (c.i.)')
+plt.ylabel('Maximum loss of portfolio')
+
+
+plt.legend()
+plt.show()
