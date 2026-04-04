@@ -16,7 +16,7 @@ class Covar_:
         S = self.risk(curve=curve)
         S_T = S.transpose()
         c  = np.sqrt(np.matmul(S_T, np.matmul(Q, S)))[0][0]
-
+        
         if alpha is not None: 
             # find the point X that has P(x <= X) >= alpha
             return norm.ppf(1-alpha) * c

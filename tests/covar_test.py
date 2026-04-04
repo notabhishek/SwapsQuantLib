@@ -75,22 +75,28 @@ Q = daily_changes_bp.cov()
 print('Covariance matrix')
 print(Q)
 
-print(f'c = {portfolio.covar(s_cv, Q)=}')
-print(f'{portfolio.covar(s_cv, Q, alpha=0.05)=}')
-print(f'{portfolio.covar(s_cv, Q, alpha=0.01)=}')
+print(f'Portfolio standard deviation: c = {portfolio.covar(s_cv, Q)=}')
 
-x = [i for i in range(50, 100)]
-y = [portfolio.covar(s_cv, Q, alpha=(1-xi/100)) for xi in x]
-
-key_x = [80, 90, 95, 99]
+key_x = [50, 84.13447, 90, 95, 99]
 key_y = [portfolio.covar(s_cv, Q, alpha=(1-xi/100)) for xi in key_x]
 
+for x, covar_x in zip(key_x, key_y):
+    print(f'{x}% of the time loss <= {covar_x}')
+    plt.annotate(f'({x}%, {covar_x:.0f})', 
+                 xy=(x, covar_x), 
+                 xytext=(5, 5), 
+                 textcoords='offset points',
+                 fontsize=9)
+    
+x = [i for i in range(0, 100)]
+y = [portfolio.covar(s_cv, Q, alpha=(1-xi/100)) for xi in x]
 
-plt.plot(np.array(x), np.array(y), label='Portfolio loss vs c.i')
-plt.scatter(key_x, key_y, label='Key CI')
 
-plt.xlabel('Confidence interval (c.i.)')
-plt.ylabel('Maximum loss of portfolio')
+plt.plot(np.array(x), np.array(y), label='Portfolio loss (negative is gain)')
+plt.scatter(key_x, key_y, label='Key confidence levels')
+
+plt.xlabel('Confidence Level (%)')
+plt.ylabel('Loss value')
 
 
 plt.legend()
