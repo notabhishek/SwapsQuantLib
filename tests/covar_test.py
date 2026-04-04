@@ -31,6 +31,24 @@ swaps = [
     Swap(datetime(2022, 1, 1), 12 * 20, 12, 12, fixed_rate=2.20, notional=-1.81e6),
 ]
 
+"""
+N = 5
+
+2  4  8 0 -5 
+
+1.8 1.8 1.8 1.8 1.8
+
+Mean: (u) : sum / N = 9/5 = 1.8
+
+Variance: sum((Xi - u)**2)/N
+
+Covariance; sum((Xi-ux) * (Xj - uj)) / N
+
+Variance: [(0.2)**2 + 2.2**2 + .. ] / 5
+Std.deviation = sqrt(variance)
+
+
+"""
 portfolio = Portfolio(objects=swaps)
 
 print(f'{portfolio.npv(s_cv).real=}')
@@ -44,6 +62,8 @@ historical_rates = pd.DataFrame({
     "30Y": [2.201, 2.217, 2.228, 2.239, 2.226, 2.235, 2.242, 2.236, 2.22, 2.200],
 })
 
+print('Daily prices')
+print(historical_rates)
 print('Diffs')
 daily_changes_bp = historical_rates.diff(periods=-1) * 100
 print(daily_changes_bp)
