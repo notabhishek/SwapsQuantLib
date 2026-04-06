@@ -1,7 +1,8 @@
 from core.solvedcurve import SolvedCurve
 from core.covar import Covar_
+from core.pca import PCA_
 
-class Portfolio(Covar_):
+class Portfolio(Covar_, PCA_):
     def __init__(self, objects: list = []):
         self.objects = objects
     

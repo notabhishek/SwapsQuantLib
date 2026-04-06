@@ -2,13 +2,14 @@ from core.dateutils import add_months_modfollowing, add_days
 from core.schedule import Schedule
 from core.curve import Curve
 from core.solvedcurve import SolvedCurve
-from core.covar import Covar_
 from core.dual import Dual
+from core.covar import Covar_
+from core.pca import PCA_
 
 from datetime import datetime 
 import numpy as np 
 
-class Swap(Covar_): 
+class Swap(Covar_, PCA_): 
     def __init__(self, start: datetime, tenor: int, period_fix: int, 
                  period_float: int, tenor_type: str = 'M', 
                  fixed_rate: float = None, notional: float = None):
